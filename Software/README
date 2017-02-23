@@ -1,0 +1,14 @@
+TicTacToe
+=========
+A Tic-tac-toe Arduino shield
+
+This direcory contains the sketch files to build the TicTacToe shield firmare.
+
+The TicTacToe software is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with the TicTacToe shield firmware. If not, see
+<http://www.gnu.org/licenses/>.

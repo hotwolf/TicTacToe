@@ -1,0 +1,27 @@
+TicTacToe
+=========
+A Tic-tac-toe Arduino shield
+
+Directories:
+============
+|
++-Hardware              - Everything needed to build the TicTacToe shield
+|
++-Software              - Source files of the TicTacToe shields firmware
+
+The TicTacToe software is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with the TicTacToe shield firmware. If not, see
+<http://www.gnu.org/licenses/>.
+
+The hardware design of the TicTacToe shield is licensed under a Creative
+Commons Attribution-ShareAlike 3.0 Unported License
+(http://creativecommons.org/licenses/by-sa/3.0/).
+
+The TicTacToe shield uses Kicad library components by Walter Lain which are
+licensed under a Creative Commons Attribution-ShareAlike 3.0 License 
+(http://creativecommons.org/licenses/by-sa/3.0/).

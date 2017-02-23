@@ -1,0 +1,33 @@
+TicTacToe
+=========
+A Tic-tac-toe Arduino shield
+
+
+Directories:
+============
+|
++-Plate	                - Design files of the laser cut bottom plate
+|
++-KiCad			- KiCad project file, schematic, layout, and libraries
+|
++-Gerber                - Gerber files for manufacturing
+
+
+Files:
+======
+|
++-TicTacToe-RevA Schematic.pdf      - Schematic
+|
++-TicTacToe-RevA BOM.txt            - Bill of materials
+|
++-TicTacToe-RevA Assembly Plan.pdf  - Shows the location of all components
+                                      to be assembled
+
+
+The hardware design of the TicTacToe shield is licensed under a Creative
+Commons Attribution-ShareAlike 3.0 Unported License
+(http://creativecommons.org/licenses/by-sa/3.0/).
+
+The TicTacToe shield uses Kicad library components by Walter Lain which are
+licensed under a Creative Commons Attribution-ShareAlike 3.0 License 
+(http://creativecommons.org/licenses/by-sa/3.0/).

@@ -1,0 +1,17 @@
+Bill of Materials for the TicTacToe Shield RevA:
+================================================
+
+Resistors:
+3x        270                    print            R1, R2, R3
+
+LEDs:
+9x      bicolor (common cathode) print            D1 - D9
+
+Buttons and switches:
+9 x     button  (6mmx6mm)        print            KEY0 - KEY9
+
+Connectors:
+
+1x      1X6  pin header          print            Arduino Header
+3x      1X8  pin header          print            Arduino Header
+1x      1X10  pin header          print            Arduino Header
