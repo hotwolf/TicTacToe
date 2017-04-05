@@ -79,7 +79,6 @@
 // Constants
 //===========
 #define FRAMERATE 60  //framerate [fps]
-#define ANIMATE   15  //animate after n frames
 #define DEBOUNCE  10  //debounce delay [ms]
 #define FIFODEPTH  8  //size of input buffer
 
@@ -96,6 +95,8 @@ typedef unsigned int fields;
 typedef enum {release, detect, debounce } keyState;
 typedef enum {red, green} dispState;
 
+typedef void (*animCallback) ();
+
 // Inline assembler
 //==================
 //Wait for any interrupt
@@ -108,13 +109,13 @@ do {                                             \
 // Functions
 //===========
 namespace TicTacToeDrv {
-  void   setup();                            //constructor
-  fields getKey();                           //wait for keyboard input
-  void   setRed(fields red);                 //set red display fields
-  void   setGreen(fields green);             //set green display fields 
-  fields getRed();                           //get red display fields
-  fields getGreen();                         //Get green display fields
-  void   setAnimation(void (*_dispAnimate)); //set green display fields 
+  void   setup();                              //driver setup
+  fields getKey();                             //wait for keyboard input
+  void   setRed(fields red);                   //set red display fields
+  void   setGreen(fields green);               //set green display fields 
+  fields getRed();                             //get red display fields
+  fields getGreen();                           //Get green display fields
+  void   setAnimation(animCallback callback);  //set green display fields 
 }
 
 #endif

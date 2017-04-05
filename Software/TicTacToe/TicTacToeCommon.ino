@@ -1,7 +1,5 @@
-#ifndef TicTacToeDrv_h
-#define TicTacToeDrv_h
 //###############################################################################
-//# TicTacToe - Driver Library                                                  #
+//# TicTacToe - Common Subroutines                                              #
 //###############################################################################
 //#    Copyright 2017 Dirk Heisswolf                                            #
 //#    This file is part of the TicTacToe project.                              #
@@ -72,50 +70,61 @@
 //#                                                                             #
 //###############################################################################
 //# Version History:                                                            #
-//#    March 24, 2017                                                           #
+//#    April 5, 2017                                                            #
 //#      - Initial release                                                      #
 //###############################################################################
 
-// Constants
-//===========
-#define FRAMERATE 60  //framerate [fps]
-#define DEBOUNCE  10  //debounce delay [ms]
-#define FIFODEPTH  8  //size of input buffer
+#include "TicTacToe.h"
 
-// Type definitions
-//==================
-//field:
-// A|B|C     15     8 7      0
-// -+-+-    +--------+--------+ 
-// D|E|F => |-------I|HGFEDCBA| 
-// -+-+-    +--------+--------+ 
-// G|H|I
-typedef unsigned int fields;  
 
-typedef enum {release, detect, debounce } keyState;
-typedef enum {red, green} dispState;
+//Find row fo three
+// args:   board
+// result: all rows of three
+fields threeInARow(fields player) {
+  fields result = 0;
 
-typedef void (*animCallback) ();
+  //Check 8 patterns
+  // ---
+  // ...
+  // ...
+  result |= ((player & 0b000000111) == 0b000000111) ? 0b000000111 : 0b000000000;
+  // ...
+  // ---
+  // ...
+  result |= ((player & 0b000111000) == 0b000111000) ? 0b000111000 : 0b000000000;
+  // ...
+  // ...
+  // ---
+  result |= ((player & 0b111000000) == 0x111000000) ? 0b111000000 : 0b000000000;
+  // |..
+  // |..
+  // |..
+  result |= ((player & 0b001001001) == 0x001001001) ? 0b001001001 : 0b000000000;
+  // .|.
+  // .|.
+  // .|.
+  result |= ((player & 0b010010010) == 0x010010010) ? 0b010010010 : 0b000000000;
+  // ..|
+  // ..|
+  // ..|
+  result |= ((player & 0b100100100) == 0x100100100) ? 0b100100100 : 0b000000000;
+  // \..
+  // .\.
+  // ..\
+  result |= ((player & 0b100010001) == 0x100010001) ? 0b100010001 : 0b000000000;
+  // ../
+  // ./.
+  // /..
+  result |= ((player & 0b001010100) == 0x001010100) ? 0b001010100 : 0b000000000;
 
-// Inline assembler
-//==================
-//Wait for any interrupt
-#define WAIT_FOR_INTERRUPT()                     \
-do {                                             \
-  __asm__ __volatile__ ( "sei" "\n\t" :: );      \
-  __asm__ __volatile__ ( "sleep" "\n\t" :: );    \
-} while(0)
-
-// Functions
-//===========
-namespace TicTacToeDrv {
-  void   setup();                              //driver setup
-  fields getKey();                             //wait for keyboard input
-  void   setRed(fields red);                   //set red display fields
-  void   setGreen(fields green);               //set green display fields 
-  fields getRed();                             //get red display fields
-  fields getGreen();                           //Get green display fields
-  void   setAnimation(animCallback callback);  //set green display fields 
+  return result;
 }
 
-#endif
+
+
+
+
+
+
+
+

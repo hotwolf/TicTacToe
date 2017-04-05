@@ -1,7 +1,7 @@
-#ifndef TicTacToeDrv_h
-#define TicTacToeDrv_h
+#ifndef TicTacToeAnim_h
+#define TicTacToeAnim_h
 //###############################################################################
-//# TicTacToe - Driver Library                                                  #
+//# TicTacToe - Animation Routines                                              #
 //###############################################################################
 //#    Copyright 2017 Dirk Heisswolf                                            #
 //#    This file is part of the TicTacToe project.                              #
@@ -78,44 +78,20 @@
 
 // Constants
 //===========
-#define FRAMERATE 60  //framerate [fps]
-#define DEBOUNCE  10  //debounce delay [ms]
-#define FIFODEPTH  8  //size of input buffer
 
 // Type definitions
 //==================
-//field:
-// A|B|C     15     8 7      0
-// -+-+-    +--------+--------+ 
-// D|E|F => |-------I|HGFEDCBA| 
-// -+-+-    +--------+--------+ 
-// G|H|I
-typedef unsigned int fields;  
-
-typedef enum {release, detect, debounce } keyState;
-typedef enum {red, green} dispState;
-
-typedef void (*animCallback) ();
 
 // Inline assembler
 //==================
-//Wait for any interrupt
-#define WAIT_FOR_INTERRUPT()                     \
-do {                                             \
-  __asm__ __volatile__ ( "sei" "\n\t" :: );      \
-  __asm__ __volatile__ ( "sleep" "\n\t" :: );    \
-} while(0)
 
 // Functions
 //===========
-namespace TicTacToeDrv {
-  void   setup();                              //driver setup
-  fields getKey();                             //wait for keyboard input
-  void   setRed(fields red);                   //set red display fields
-  void   setGreen(fields green);               //set green display fields 
-  fields getRed();                             //get red display fields
-  fields getGreen();                           //Get green display fields
-  void   setAnimation(animCallback callback);  //set green display fields 
+namespace TicTacToeAnim {
+  void   blink(fields highlight);            //blink selected fields
+  void   scan(fields highlight);             //move highlight through selected fields
+  void   chooseGame();                       //scroll a "Choose Game" banner
+  void   noAnim();                           //stop all animations   
 }
 
 #endif

@@ -95,7 +95,7 @@ namespace {
   unsigned char _keyBufOut         = 0;       //index of oldest entry in FIFO buffer
   fields        _dispBuf[2]        = { 0 };   //display buffer (0=red, 1=green)
   unsigned char _dispSubFrame      = 0;       //index of oldest entry in FIFO buffer  
-  void           (*_dispAnimate)() = NULL;    //animation callback
+  animCallback  _dispAnimate       = NULL;    //animation callback
 }
 
 // Hidden Functions
@@ -195,6 +195,13 @@ fields TicTacToeDrv::getGreen() {
   return _dispBuf[1];
 }
 
+//Set animation callback
+// args:   none
+// result: fields
+void TicTacToeDrv::setAnimation(animCallback callback) {
+  _dispAnimate = callback;
+}
+
 // ISRs
 //======
 namespace {
@@ -215,22 +222,18 @@ namespace {
     colSel = 1 << colNum;
     colRaw = (unsigned char) (_dispBuf[colNum & 1]) >> (colNum >> 1);
     colPat = ~(((colRaw & 0x40) >> 4) |
-  	     ((colRaw & 0x08) >> 2) |
-  	     ( colRaw & 0x01));
+             ((colRaw & 0x08) >> 2) |
+             ( colRaw & 0x01));
   
     //Apply column selector and row pattern
     PORTC = 0;                                //deselect all columns                
     PORTB = colPat;                           //apply column pattern
     PORTC = colSel;                           //select column
   
-    //Update subframe counter
-    _dispSubFrame++;                          //increment subframe count
-    if (_dispSubFrame > (ANIMATE*6)) {
-      _dispSubFrame = 0;                      //reset subframe count
-      if (_dispAnimate != NULL) {
-        _dispAnimate();
-      }    
-    } 
+    //Animation callback
+    if (_dispAnimate != NULL) {
+      _dispAnimate();
+    }    
   }
   
   // Timer 2 compare match B handler
@@ -252,7 +255,7 @@ namespace {
     //Parse captured keys
     key = 0;                                  //initialize iterator
     while (( keys      != 0) &&               //unparsed keys left
-  	 ((keys & 1) == 0)) {               //current key is not pushed
+         ((keys & 1) == 0)) {               //current key is not pushed
       key++;                                  //increment iterator
       keys >>= 1;                             //shift to next key
     }
