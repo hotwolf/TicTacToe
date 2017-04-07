@@ -88,10 +88,10 @@
 // Functions
 //===========
 namespace TicTacToeAnim {
-  void   blink(fields highlight);            //blink selected fields
-  void   scan(fields highlight);             //move highlight through selected fields
-  void   chooseGame();                       //scroll a "Choose Game" banner
-  void   noAnim();                           //stop all animations   
+  void   blink( fields red, fields green, fields highlight); //blink selected fields
+  void   scan(  fields red, fields green, fields highlight); //move highlight through selected fields
+  void   noAnim(fields red, fields green);                   //stop all animations   
+  void   chooseGameBanner();                                 //scroll a "Choose Game" banner
 }
 
 #endif

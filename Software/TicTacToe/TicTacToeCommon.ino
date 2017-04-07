@@ -76,55 +76,188 @@
 
 #include "TicTacToe.h"
 
+// Checks
+//========
+//Check if a set of fields is a subset of another set of fields
+// args:   superset: set of fields
+//         subset:   set of fields  
+// result: true if "subset" is a subset of "superset"
+boolean isSubset(fields superset, fields subset) {
+  return (superset & subset == subset);
+}
 
-//Find row fo three
-// args:   board
-// result: all rows of three
-fields threeInARow(fields player) {
+//Check if the center field is free 
+// args:   set: set of fields
+// result: true if the center field is free
+boolean isCenterFree(fields set) {
+  return !isSubset(set, 0x000010000);
+}
+
+// Basic operations
+//==================
+//Invert a set if fields
+// args:   set: set of fields
+// result: inverted set of fields
+fields invert(fields set) {
+  return (~set & 0x111111111);
+}
+
+//Count fields
+// args:   player: current player's fields
+// result: number of fields occupied by the player
+unsigned char countFields(fields player) {
+  unsigned char result = 0;
+  //Iterate through all fields
+  for (fields iterator = 0b000000001;
+       iterator < 0b111111111;
+       iterator <<= 1) {
+    if (isSubset(player, iterator)) {	
+      result++;
+    }
+  }
+  return result;
+}
+
+//Select a random field
+// args:   set: set of selectable fields
+// result: randomly selected field
+fields randomField(fields set) {
+  unsigned char fieldCount = random(countFields(set));
+  
+  //Iterate through all fields
+  for (fields iterator = 0b000000001;
+       iterator < 0b111111111;
+       iterator <<= 1) {
+    if (isSubset(set, iterator)) {	
+      if (!fieldCount--) {
+	  return fieldCount;
+      }
+    }	
+  }
+}
+
+// Queries
+//=========
+//Find completed rows
+// args:   set: set of fields to query
+// result: all fields that are part of a completed row
+fields findCompletedRows(fields set) {
   fields result = 0;
 
   //Check 8 patterns
   // ---
   // ...
   // ...
-  result |= ((player & 0b000000111) == 0b000000111) ? 0b000000111 : 0b000000000;
+  result |= ((set & 0b000000111) == 0b000000111) ? 0b000000111 : 0b000000000;
   // ...
   // ---
   // ...
-  result |= ((player & 0b000111000) == 0b000111000) ? 0b000111000 : 0b000000000;
+  result |= ((set & 0b000111000) == 0b000111000) ? 0b000111000 : 0b000000000;
   // ...
   // ...
   // ---
-  result |= ((player & 0b111000000) == 0x111000000) ? 0b111000000 : 0b000000000;
+  result |= ((set & 0b111000000) == 0x111000000) ? 0b111000000 : 0b000000000;
   // |..
   // |..
   // |..
-  result |= ((player & 0b001001001) == 0x001001001) ? 0b001001001 : 0b000000000;
+  result |= ((set & 0b001001001) == 0x001001001) ? 0b001001001 : 0b000000000;
   // .|.
   // .|.
   // .|.
-  result |= ((player & 0b010010010) == 0x010010010) ? 0b010010010 : 0b000000000;
+  result |= ((set & 0b010010010) == 0x010010010) ? 0b010010010 : 0b000000000;
   // ..|
   // ..|
   // ..|
-  result |= ((player & 0b100100100) == 0x100100100) ? 0b100100100 : 0b000000000;
+  result |= ((set & 0b100100100) == 0x100100100) ? 0b100100100 : 0b000000000;
   // \..
   // .\.
   // ..\
-  result |= ((player & 0b100010001) == 0x100010001) ? 0b100010001 : 0b000000000;
+  result |= ((set & 0b100010001) == 0x100010001) ? 0b100010001 : 0b000000000;
   // ../
   // ./.
   // /..
-  result |= ((player & 0b001010100) == 0x001010100) ? 0b001010100 : 0b000000000;
+  result |= ((set & 0b001010100) == 0x001010100) ? 0b001010100 : 0b000000000;
 
   return result;
 }
 
+//Find completable rows
+// args:   player:   current player's set offields
+//         opponent: opponent's set of fields
+// result: all fields that would complete a row for the current player
+fields findCompletableRows(fields player, fields opponent) {
+  fields result = 0;
+  //Iterate through all fields
+  for (fields iterator = 0b000000001;
+       iterator < 0b111111111;
+       iterator <<= 1) {
+    if (!isSubset((player|opponent), iterator)) {	
+      if (findCompletedRows(player|iterator)) {
+	result |= iterator;
+      }
+    }
+  }
+  return result;
+}
 
+//Find neighbors
+// args:   set: set of fields to find neighbors for
+// result: all fields that are part of a completed row
+fields findNeighbors(fields set) {
+  fields result = 0;
 
+  //Left neighbors
+  result |= (set >> 1) & 0x011011011;
+  //Rightt neighbors
+  result |= (set << 1) & 0x110110110;
+  //Upper neighbors
+  result |= (set >> 3);
+  //Lower neighbors
+  result |= (set << 3);
 
+  return result;
+}
 
+// Inputs
+//========
+//Select game
+// args:   none 
+// result: pushed button
+fields selectGame() {
+  fields result = 0b000000000;
 
+  //Display banner
+  chooseGameBanner();
+  
+  //Get input
+  result = getKey();
 
+  //Stop blinking
+  noAnim(0x000000000, 0x000000000);
+  
+  return result;
+}
+
+//Select field
+// args:   red:        red fields on the board
+//         green:      green fields on the bord
+//         selectable: set of selectable fields
+// result: selected field
+fields selectField(fields red, fields green, fields selectable) {
+  fields result = 0b000000000;
+
+  //Display selection
+  scan(red, green, selectable);
+  
+  //Get input
+  do {
+    result = getKey();
+  } while (!isSubset(selectable, result));
+
+  //stop blinking
+  noAnim(red, green);
+  
+  return result;
+}
 
 

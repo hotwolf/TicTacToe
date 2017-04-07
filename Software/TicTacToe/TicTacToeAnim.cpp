@@ -17,58 +17,6 @@
 //#    You should have received a copy of the GNU General Public License        #
 //#    along with TicTacToe.  If not, see <http://www.gnu.org/licenses/>.       #
 //###############################################################################
-//# Display:                                                                    #
-//# ========                                                                    #
-//#                                                                             #
-//#  Cathodes:       +-+   +-+   +-+                                            #
-//#  PB2 ------------|A|---|B|---|C|                                            #
-//#                  +-+   +-+   +-+                                            #
-//#                   |     |     |                                             #
-//#                  +-+   +-+   +-+                                            #
-//#  PB1 ------------|D|---|E|---|F|                                            #
-//#                  +-+   +-+   +-+                                            #
-//#                   |     |     |                                             #
-//#                  +-+   +-+   +-+                                            #
-//#  PB0 ------------|G|---|H|---|I|                                            #
-//#                  +-+   +-+   +-+                                            #
-//#                   |     |     |                                             #
-//#  Anodes:          |     |     |                                             #
-//#  PC0 --red---+----+     |     |                                             #
-//#  PC1 --green-+          |     |                                             #
-//#                         |     |                                             #
-//#  PC2 --red---+----------+     |                                             #
-//#  PC3 --green-+                |                                             #
-//#                               |                                             #
-//#  PC4 --red---+----------------+                                             #
-//#  PC5 --green-+                                                              #
-//#                                                                             #
-//# Keypad:                                       +-------------------+         #
-//# =======                                       |  Wait until all   |         #
-//#                                               | keys are released |<--+     #
-//#  Rows:           +-+   +-+   +-+              +---------+---------+   |     #
-//#  PD4 ------------|A|---|B|---|C|                        |             |     #
-//#                  +-+   +-+   +-+                        V             |     #
-//#                   |     |     |               +---------+---------+   |     #
-//#                  +-+   +-+   +-+              |  Wait until any   |   |     #
-//#  PD3 ------------|D|---|E|---|F|              |  key is pressed   |   |     #
-//#                  +-+   +-+   +-+              +---------+---------+   |     #
-//#                   |     |     |                         |             |     #
-//#                  +-+   +-+   +-+                        V             |     #
-//#  PD2 ------------|G|---|H|---|I|              +---------+---------+   |     #
-//#                  +-+   +-+   +-+              |   Wait for the    |   |     #
-//#  Columns:         |     |     |               |  debounce delay   |   |     #
-//#  PD5 -------------+     |     |               +---------+---------+   |     #
-//#                         |     |                         |             |     #
-//#  PD6 -------------------+     |                         V             |     #
-//#                               |               +---------+---------+   |     #
-//#  PD7 -------------------------+               |  Scan keypad and  |   |     #
-//#                                               | queue keycode if  +---+     #
-//#                                               |the input is valid |         #
-//#                                               +---------+---------+         #
-//#                                                                             #
-//#                                                                             #
-//#                                                                             #
-//###############################################################################
 //# Version History:                                                            #
 //#    March 24, 2017                                                           #
 //#      - Initial release                                                      #
@@ -142,25 +90,23 @@ namespace {
 namespace {
   void blinkCallback();                     //callback routine for the blink animation
   void scanCallback();                      //callback routine for the scan animation
-  void chooseGameCallback();                //callback routine for the "Choose Game" animation
+  void chooseGameBannerCallback();                //callback routine for the "Choose Game" animation
 }
 
 // Functions
 //===========
 
 //Blink selected fields
-// args:   selected fields
+// args:   red:       set of red fields
+//         green:     set of green fields
+//         highlight: set of highlighted fields
 // result: none
-void TicTacToeAnim::blink(fields highlight) {
-  //Save current screen
-  //  red   -> animBuf[0] 
-  //  green -> animBuf[1]
-  _animBuf[0] = TicTacToeDrv::getRed();
-  _animBuf[1] = TicTacToeDrv::getGreen();
-  
-  //Calculate highlighted screen
-  _animBuf[2] = _animBuf[0] | highlight;     //red
-  _animBuf[3] = _animBuf[3] | highlight;     //green
+void TicTacToeAnim::blink(fields red, fields green, fields highlight) {
+  //Set animation buffer
+  _animBuf[0] = red;                        //phase1 red
+  _animBuf[1] = green;                      //phase1 green
+  _animBuf[2] = red   | highlight;          //phase2 red
+  _animBuf[3] = green | highlight;          //phase2 green
   
   //Set animation counter
   _animCount = FRAMERATE;                   //duration: 1sec
@@ -185,20 +131,16 @@ void blinkCallback() {
 }
 
 //Move highlight through selected fields
-// args:   selected fields
+// args:   red:       set of red fields
+//         green:     set of green fields
+//         highlight: set of highlighted fields
 // result: none
-void TicTacToeAnim::scan(fields highlight) {
-  //Save current screen
-  //  red   -> animBuf[0] 
-  //  green -> animBuf[1]
-  _animBuf[0] = TicTacToeDrv::getRed();
-  _animBuf[1] = TicTacToeDrv::getGreen();
-  
-  //Save selection
-  _animBuf[2] = highlight;
-
-  //Reset field pointer
-  _animBuf[3] = 0;
+void TicTacToeAnim::scan(fields red, fields green, fields highlight) {
+  //Set animation buffer
+  _animBuf[0] = red;                        //red fields
+  _animBuf[1] = green;                      //green fields
+  _animBuf[2] = highlight;                  //highlights
+  _animBuf[3] = 0;                          //iterator
 
   //Set animation counter
   _animCount = 0.5*FRAMERATE;               //duration: 0.5sec
@@ -235,30 +177,22 @@ void scanCallback() {
 }
 
 //Scroll "Choose Game" banner
-// args:   
+// args:   none
 // result: none
-void TicTacToeAnim::chooseGame() {
-  //Save current screen
-  //  red   -> animBuf[0] 
-  //  green -> animBuf[1]
-  _animBuf[0] = TicTacToeDrv::getRed();
-  _animBuf[1] = TicTacToeDrv::getGreen();
-  
-  //Current pattern
-  _animBuf[2] = 0;
-
-  //Follow-up pattern
-  _animBuf[3] = 0;
+void TicTacToeAnim::chooseGameBanner() {
+  //Set animation buffer
+  _animBuf[0] = 0x000000000;                 //current pattern
+  _animBuf[1] = 0x000000000;                 //follow-up pattern
 
   //Set animation counter
   _animCount = -1;
 
   //Set animation callback
-  TicTacToeDrv::setAnimation(chooseGameCallback);
+  TicTacToeDrv::setAnimation(chooseGameBannerCallback);
 }
 
 //"Choose Game" callback
-void chooseGameCallback() {
+void chooseGameBannerCallback() {
   //Local variables
   byte patternCount;
   
@@ -272,12 +206,12 @@ void chooseGameCallback() {
     switch ((_animCount / (FRAMERATE/4) % 3)) {
       case 0:
         //Shift in next pattern
-        _animBuf[2] = _animBuf[3];
-        _animBuf[3] = pgm_read_word(&_chooseGameBanner[_animCount / (3*(FRAMERATE/4))]);
+        _animBuf[0] = _animBuf[1];
+        _animBuf[1] = pgm_read_word(&_chooseGameBanner[_animCount / (3*(FRAMERATE/4))]);
         
         //Display pattern
-        TicTacToeDrv::setRed(  _animBuf[2]);
-        TicTacToeDrv::setGreen(_animBuf[2]);
+        TicTacToeDrv::setRed(  _animBuf[0]);
+        TicTacToeDrv::setGreen(_animBuf[0]);
         
         //Reset frame counter
         if (_animBuf[3] == 0) {
@@ -287,15 +221,15 @@ void chooseGameCallback() {
         
       case 1:     
         //Display pattern
-        TicTacToeDrv::setRed(((_animBuf[2] & 0x1B6) >> 1) |
-                             ((_animBuf[3] & 0x049) << 2));
+        TicTacToeDrv::setRed(((_animBuf[0] & 0x1B6) >> 1) |
+                             ((_animBuf[1] & 0x049) << 2));
         TicTacToeDrv::setGreen(TicTacToeDrv::getRed());
         break;                 
         
       case 2:     
         //Display pattern
         TicTacToeDrv::setRed(((_animBuf[2] & 0x124) >> 2) |
-                             ((_animBuf[3] & 0x0DB) << 1));
+                             ((_animBuf[1] & 0x0DB) << 1));
         TicTacToeDrv::setGreen(TicTacToeDrv::getRed());
         break;                 
     }
@@ -303,14 +237,13 @@ void chooseGameCallback() {
 }       
 
 //Stop ongoing animation
-// args:   
+// args:   red:   set of red fields
+//         green: set of green fields
 // result: none
-void TicTacToeAnim::noAnim() {
-  //Restore screen
-  //  red   -> animBuf[0] 
-  //  green -> animBuf[1]
-  TicTacToeDrv::setRed(  _animBuf[0]);
-  TicTacToeDrv::setGreen(_animBuf[1]);
+void TicTacToeAnim::noAnim(fields red, fields green) {
+  //Set animation buffer
+  _animBuf[0] = red;                        //red fields
+  _animBuf[1] = green;                      //green fields
 
   //Remove animation callback
   TicTacToeDrv::setAnimation(NULL);
