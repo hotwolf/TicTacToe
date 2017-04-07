@@ -87,11 +87,11 @@ namespace {
 
 // Hidden Functions
 //==================
-namespace {
+//namespace {
   void blinkCallback();                     //callback routine for the blink animation
   void scanCallback();                      //callback routine for the scan animation
   void chooseGameBannerCallback();                //callback routine for the "Choose Game" animation
-}
+//}
 
 // Functions
 //===========

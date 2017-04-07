@@ -19,7 +19,7 @@
 //###############################################################################
 //# Rules:                                                                      #
 //# ======                                                                      #
-//# The green player begins. Alternatelr each player places one mark on an      #
+//# The green player begins. Alternately each player places one mark on an      #
 //# empty field on the board. The player who first manages to place three marks #
 //# in one row (horizontal, vertical, or dialonal) wins the game.               #
 //#                                                                             #
@@ -48,6 +48,7 @@ void playClassic (bool greenIsHuman, bool redIsHuman) {
     //Green move
     //==========
     green |= makeMoveClassic(greenIsHuman, green, red, red , green);
+    noAnim(red, green);
 
     //Check board
     //===========
@@ -58,6 +59,7 @@ void playClassic (bool greenIsHuman, bool redIsHuman) {
     //Red move
     //========
     red |= makeMoveClassic(redIsHuman, red, green, red , green);
+    noAnim(red, green);
 
     //Check board
     //===========
@@ -66,8 +68,9 @@ void playClassic (bool greenIsHuman, bool redIsHuman) {
     }
   }
 
-  //Wait for input to continue
+  //Wait for input to continue and clear the sisplay
   getKey();
+  noAnim(0b000000000, 0b000000000);
 }
    
 //Make one move in the classic game
@@ -82,24 +85,24 @@ fields makeMoveClassic(bool isHuman, fields player, fields opponent, fields red 
     
   if (isHuman) {
     //Wait for input
-    return selectField(red, green, invert(red|green)); 
+    return selectField(red, green, inverseOf(red|green)); 
   } else {
     //Try to complete one row
-    tmp = findCompletableRows(player, opponent);
+    tmp = completingDrops(player, opponent);
     if (tmp) {
-      return randomField(tmp);
+      return oneOf(tmp);
     } else {
       //Prevent opponent from completing one row
-      tmp = findCompletableRows(opponent, player);
+      tmp = completingDrops(opponent, player);
       if (tmp) {
-	return randomField(tmp);
+	return oneOf(tmp);
       } else {
 	//Occupy the center if possible
 	if (isCenterFree(red|green)) {
 	  return 0b000010000;
 	} else {
 	  //Make random move
-	  return randomField(invert(red|green));
+	  return oneOf(inverseOf(red|green));
 	}
       }
     }   
@@ -114,7 +117,7 @@ bool checkBoardClassic(fields red , fields green) {
   fields tmp   = 0b000000000;  //temporary storage
 
   //Check if green won
-  tmp = findCompletedRows(green);
+  tmp = completedRowsIn(green);
   if (tmp) {
     //Signal victory
     blink(red, green, tmp);
@@ -122,7 +125,7 @@ bool checkBoardClassic(fields red , fields green) {
   }
 
   //Check if red won
-  tmp = findCompletedRows(red);
+  tmp = completedRowsIn(red);
   if (tmp) {
     //Signal victory
     blink(red, green, tmp);

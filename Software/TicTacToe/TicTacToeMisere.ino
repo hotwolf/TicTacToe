@@ -19,9 +19,9 @@
 //###############################################################################
 //# Rules:                                                                      #
 //# ======                                                                      #
-//# The green player begins. Alternatelr each player places one mark on an      #
-//# empty field on the board. The player who first manages to place three marks #
-//# in one row (horizontal, vertical, or dialonal) wins the game.               #
+//# The green player begins. Alternately each player places one mark on an      #
+//# empty field on the board. The player who places three marks in one row      #
+//# (horizontal, vertical, or dialonal) looses the game.                        #
 //#                                                                             #
 //###############################################################################
 //# Version History:                                                            #
@@ -48,6 +48,7 @@ void playMisere (bool greenIsHuman, bool redIsHuman) {
     //Green move
     //==========
     green |= makeMoveMisere(greenIsHuman, green, red, red , green);
+    noAnim(red, green);
 
     //Check board
     //===========
@@ -58,7 +59,8 @@ void playMisere (bool greenIsHuman, bool redIsHuman) {
     //Red move
     //========
     red |= makeMoveMisere(redIsHuman, red, green, red , green);
-
+    noAnim(red, green);
+   
     //Check board
     //===========
     if (checkBoardMisere(red, green)) {
@@ -66,8 +68,9 @@ void playMisere (bool greenIsHuman, bool redIsHuman) {
     }
   }
 
-  //Wait for input to continue
+  //Wait for input to continue and clear the sisplay
   getKey();
+  noAnim(0b000000000, 0b000000000);
 }
    
 //Make one move in the classic game
@@ -78,20 +81,20 @@ void playMisere (bool greenIsHuman, bool redIsHuman) {
 //         green:    all green marks
 // result: new mark to be placed
 fields makeMoveMisere(bool isHuman, fields player, fields opponent, fields red , fields green) {
-  fields remainingMoves = invert(red|green); //pick the best one out of these fields
+  fields remainingMoves = inverseOf(red|green); //pick the best one out of these fields
   fields tmp            = 0b000000000;       //temporary storage
   
   if (isHuman) {
     //Wait for input
-    return selectField(red, green, invert(red|green)); 
+    return selectField(red, green, inverseOf(red|green)); 
   } else {
     //Exclude loosing moves if possible
-    tmp = remainingMoves & invert(findCompletableRows(player, opponent));
+    tmp = remainingMoves & inverseOf(completingDrops(player, opponent));
     if (tmp) {
       remainingMoves = tmp;               //continue selection
     }
     //Keep opponent's completable rows open
-    tmp = remainingMoves & invert(findCompletableRows(opponent, player));
+    tmp = remainingMoves & inverseOf(completingDrops(opponent, player));
     if (tmp) {
       remainingMoves = tmp;               //continue selection
     }
@@ -101,7 +104,7 @@ fields makeMoveMisere(bool isHuman, fields player, fields opponent, fields red ,
       remainingMoves = tmp;               //continue selection
     }
     //return one of the remaining fields
-    return randomField(remainingMoves);
+    return oneOf(remainingMoves);
   }
 }
   
@@ -113,14 +116,14 @@ bool checkBoardMisere(fields red , fields green) {
   fields tmp   = 0b000000000;  //temporary storage
 
   //Check if green won
-  if (findCompletedRows(red)) {
+  if (completedRowsIn(red)) {
     //Signal victory
     blink(red, green, green);
     return true;
   }
 
   //Check if red won
-  if (findCompletedRows(green)) {
+  if (completedRowsIn(green)) {
     //Signal victory
     blink(red, green, red);
     return true;

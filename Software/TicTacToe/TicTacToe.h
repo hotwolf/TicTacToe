@@ -47,40 +47,58 @@ boolean isCenterFree(fields set);
 
 // Basic operations
 //==================
-//Invert a set if fields
+//Invert a set of fields
 // args:   set: set of fields
 // result: inverted set of fields
-fields invert(fields set);
+fields inverseOf(fields set);
 
-//Count fields
-// args:   player: current player's fields
-// result: number of fields occupied by the player
-unsigned char countFields(fields player);
+//Find all horizintal and vertical neighbors of a given set of fields
+// args:   set: set of fields to find neighbors for
+// result: neighbors of input set
+fields neighborsOf(fields set);
 
-//Select a random field
+//Find all completed rows in a given set of fields
+// args:   set: set of fields
+// result: all fields that are part of a completed row
+fields completedRowsIn(fields set);
+
+//Count the fields in a given set
+// args:   set: set of fields
+// result: number of fields in the the set
+unsigned char countOf(fields set);
+
+//Select one random field out of a given set
 // args:   set: set of selectable fields
 // result: randomly selected field
-fields randomField(fields set);
+fields oneOf(fields set);
 
-// Queries
-//=========
-//Find completed rows
-// args:   set: set of fields to query
-// result: all fields that are part of a completed row
-fields findCompletedRows(fields set);
-
-//Find completable rows
-// args:   player:   current player's set offields
+// Board Queries
+//===============
+//Find all vacant field that will complete a row for the player
+// args:   player:   current player's set of fields
 //         opponent: opponent's set of fields
 // result: all fields that would complete a row for the current player
-fields findCompletableRows(fields player, fields opponent);
+fields completingDrops(fields player, fields opponent);
 
-//Find neighbors
-// args:   set: set of fields to find neighbors for
-// result: all fields that are part of a completed row
-fields findNeighbors(fields set);
+//Find all shiftable fields
+// args:   player:   current player's set of fields
+//         opponent: opponent's set of fields
+// result: all fields that would complete a row for the current player
+fields validShifts(fields player, fields opponent);
 
-//Check 8 patterns
+
+//Find all shiftable fields that will complete a row for the player
+// args:   player:   current player's set of fields
+//         opponent: opponent's set of fields
+// result: all fields that would complete a row for the current player
+fields completingShifts(fields player, fields opponent);
+
+//Find all shiftable fields that will allow the opponent to complete a row next turn
+// args:   player:   current player's set of fields
+//         opponent: opponent's set of fields
+// result: all fields that would complete a row for the current player
+fields badShifts(fields player, fields opponent);
+  
 // Inputs
 //========
 //Select game

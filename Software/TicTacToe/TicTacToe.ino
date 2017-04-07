@@ -17,56 +17,24 @@
 //#    You should have received a copy of the GNU General Public License        #
 //#    along with TicTacToe.  If not, see <http://www.gnu.org/licenses/>.       #
 //###############################################################################
-//# Display:                                                                    #
-//# ========                                                                    #
+//# Classic Rules:                                                              #
+//# ==============                                                              #
+//# The green player begins. Alternately each player places one mark on an      #
+//# empty field on the board. The player who first manages to place three marks #
+//# in one row (horizontal, vertical, or dialonal) wins the game.               #
 //#                                                                             #
-//#  Cathodes:       +-+   +-+   +-+                                            #
-//#  PB2 ------------|A|---|B|---|C|                                            #
-//#                  +-+   +-+   +-+                                            #
-//#                   |     |     |                                             #
-//#                  +-+   +-+   +-+                                            #
-//#  PB1 ------------|D|---|E|---|F|                                            #
-//#                  +-+   +-+   +-+                                            #
-//#                   |     |     |                                             #
-//#                  +-+   +-+   +-+                                            #
-//#  PB0 ------------|G|---|H|---|I|                                            #
-//#                  +-+   +-+   +-+                                            #
-//#                   |     |     |                                             #
-//#  Anodes:          |     |     |                                             #
-//#  PC0 --red---+----+     |     |                                             #
-//#  PC1 --green-+          |     |                                             #
-//#                         |     |                                             #
-//#  PC2 --red---+----------+     |                                             #
-//#  PC3 --green-+                |                                             #
-//#                               |                                             #
-//#  PC4 --red---+----------------+                                             #
-//#  PC5 --green-+                                                              #
+//# Misere Rules:                                                               #
+//# =============                                                               #
+//# The green player begins. Alternately each player places one mark on an      #
+//# empty field on the board. The player who places three marks in one row      #
+//# (horizontal, vertical, or dialonal) looses the game.                        #
 //#                                                                             #
-//# Keypad:                                       +-------------------+         #
-//# =======                                       |  Wait until all   |         #
-//#                                               | keys are released |<--+     #
-//#  Rows:           +-+   +-+   +-+              +---------+---------+   |     #
-//#  PD4 ------------|A|---|B|---|C|                        |             |     #
-//#                  +-+   +-+   +-+                        V             |     #
-//#                   |     |     |               +---------+---------+   |     #
-//#                  +-+   +-+   +-+              |  Wait until any   |   |     #
-//#  PD3 ------------|D|---|E|---|F|              |  key is pressed   |   |     #
-//#                  +-+   +-+   +-+              +---------+---------+   |     #
-//#                   |     |     |                         |             |     #
-//#                  +-+   +-+   +-+                        V             |     #
-//#  PD2 ------------|G|---|H|---|I|              +---------+---------+   |     #
-//#                  +-+   +-+   +-+              |   Wait for the    |   |     #
-//#  Columns:         |     |     |               |  debounce delay   |   |     #
-//#  PD5 -------------+     |     |               +---------+---------+   |     #
-//#                         |     |                         |             |     #
-//#  PD6 -------------------+     |                         V             |     #
-//#                               |               +---------+---------+   |     #
-//#  PD7 -------------------------+               |  Scan keypad and  |   |     #
-//#                                               | queue keycode if  +---+     #
-//#                                               |the input is valid |         #
-//#                                               +---------+---------+         #
-//#                                                                             #
-//#                                                                             #
+//# Achi Rules:                                                                 #
+//# ===========                                                                 #
+//# The green player begins. The first eight turns are played according to the  #
+//# classic TicTacToe rules. From the ninth turn on, the players alternately    #
+//# shist one of their marks onto the empty spot. The first player to place     #
+//# three marks in one row wins the game.                                       #
 //#                                                                             #
 //###############################################################################
 //# Version History:                                                            #
@@ -79,20 +47,54 @@
 // Variables
 //===========
 fields input;
+bool greenIsHuman;
+bool redIsHuman;
 
 // Setup routine
 //===============
 void setup() {
+  //Serial library
+  Serial.begin(9600);
+  Serial.println("Ready for debugging!");
+
+  //Display and keypad
   TicTacToeDrv::setup();
-  setRed(0x01FF);
-  setGreen(0x0000);
+  noAnim(0x000000000, 0x000000000);
 }
 
 // Application loop
 //==================
 void loop() {
+  //Select game
+  chooseGameBanner();
   input = getKey();
-  setRed(  getRed()   ^ (getGreen() & input));
-  setGreen(getGreen() ^               input);
+
+  //Determine players
+  if (input & 0b001001001) {
+    //Me 1st
+    greenIsHuman = true;
+    redIsHuman   = false;
+  } else if (input & 0b010010010) {
+    //Arduino 1st
+    greenIsHuman = false;
+    redIsHuman   = true;
+  } else {
+    //Two players
+    greenIsHuman = true;
+    redIsHuman   = true;
+  }
+  
+  //Determine rules
+  if (input & 0b000000111) {
+    //Classic
+    playClassic(greenIsHuman, redIsHuman);
+  } else if (input & 0b000111000) {
+    //Misere
+    playMisere(greenIsHuman, redIsHuman);
+  } else {
+    //Achi
+    playAchi(greenIsHuman, redIsHuman);
+  }
 }
+
 
