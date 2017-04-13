@@ -82,6 +82,9 @@
 #define DEBOUNCE  10  //debounce delay [ms]
 #define FIFODEPTH  8  //size of input buffer
 
+//#define CORRECTION 0b000000000 //fix swapped LEDs
+
+
 // Type definitions
 //==================
 //field:

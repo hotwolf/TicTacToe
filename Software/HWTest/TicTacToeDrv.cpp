@@ -171,14 +171,24 @@ fields TicTacToeDrv::getKey() {
 // args:   fields
 // result: none
 void TicTacToeDrv::setRed(fields red) {
+#ifdef CORRECTION
+  _dispBuf[0] = 0b111111111 & ((~CORRECTION & red) | ( CORRECTION & _dispBuf[0]));
+  _dispBuf[1] = 0b111111111 & (( CORRECTION & red) | (~CORRECTION & _dispBuf[1]));;
+#else
   _dispBuf[0] = red;
+#endif
 }
 
 //Set green display fields 
 // args:   fields
 // result: none
 void TicTacToeDrv::setGreen(fields green) {
+#ifdef CORRECTION
+  _dispBuf[0] = 0b111111111 & (( CORRECTION & green) | (~CORRECTION & _dispBuf[0]));
+  _dispBuf[1] = 0b111111111 & ((~CORRECTION & green) | ( CORRECTION & _dispBuf[1]));;
+#else  
   _dispBuf[1] = green;
+#endif
 }
 
 //Get red display fields 
