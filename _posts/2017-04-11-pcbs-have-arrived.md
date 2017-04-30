@@ -5,4 +5,5 @@ title: PCBs have arrived
 
 The TicTacToe PCBs have arrived.
 
-![TicTacToe RevA PCBs]({{ site.github.url }}/images/PCBs.jpg)
+-> ![TicTacToe RevA PCBs]({{ site.github.url }}/images/PCBs.jpg) <-
+
