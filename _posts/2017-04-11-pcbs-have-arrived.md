@@ -5,6 +5,8 @@ title: PCBs have arrived
 
 The TicTacToe PCBs have arrived.
 <p align="center">
+
 ![TicTacToe RevA PCBs]({{ site.github.url }}/images/PCBs.jpg)
+
 </p>
 
