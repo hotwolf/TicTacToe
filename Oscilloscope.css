@@ -155,12 +155,11 @@ body {
 	text-shadow: #fff 0 0 200px;
 }
 
-
-
-
 #main #content .video{
 	margin: 12px 0;
 }
 
-
-
+img {
+    display: block;
+    margin: 0 auto;
+}
