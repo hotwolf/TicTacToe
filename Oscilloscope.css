@@ -93,7 +93,7 @@ body {
 	font-size: 8pt;
 }
 
-#sidebar .links .link a.active{
+#sidebar .links .link a.active {
 	color: #c1fff4;
 	text-shadow: #fff 0 0 100px;
 	text-decoration: none;
@@ -134,18 +134,17 @@ body {
 	margin: 0;
 }
 
-
-#main #content p{
+#main #content p {
 	padding-left:  10px;
 	padding-right: 10px;
 	text-align: justify;
 }
 
-#main #content ul{
+#main #content ul {
 	text-align: justify;
 }
 
-#main #content a{
+#main #content a {
 	color: #c1fff4;
 	text-shadow: #fff 0 0 100px;
 }
@@ -155,15 +154,10 @@ body {
 	text-shadow: #fff 0 0 200px;
 }
 
-#main #content .video{
+#main #content .video {
 	margin: 12px 0;
 }
 
-.center {
+#main .center  p {
     text-align: center;
-}
-
-img {
-    display: block;
-    margin: 0 auto;
 }
