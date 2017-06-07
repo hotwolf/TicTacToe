@@ -52,19 +52,25 @@
 
 // Constants
 //===========
-#define DISP_FPS  120          //refresh rate [fps]
-//#define DISP_FIX 0b000000000 //fix swapped LEDs
+#define DISP_FPS  120              //refresh rate [fps]
 
 // Variables                                
-//===========                                
+//===========
+//Display buffer                                
 fields       dispRedBuf     = 0;    //red display buffer
 fields       dispGreenBuf   = 0;    //green display buffer
 
+//Column index
 byte         dispColumn     = 0;    //current column
 
+//Pre-calculated port output
 byte         dispNextPortB  = 0x07; //next port B output
 byte         dispNextPortC  = 0x00; //next port C output
 
+//Highlighting
+signed char  dispHighlightCount = 0;//blink interval
+fields       dispHighlightIndex = 0;//scan index
+ 
 // Setup routine
 //===============
 void dispSetup() {
@@ -82,9 +88,9 @@ void dispSetup() {
            (1 << CS20);
   OCR2A  = 15625/(6*DISP_FPS);              //set interrupt frequency
   OCR2B  = 0;                               //
+  TIFR2  = (1 << OCF2B) |                   //clear output compare B interrupt flag
+           (1 << OCF2A);                    //clear output compare A interrupt flag
   TIMSK2 = (1 << OCIE2A);                   //enable output compare A interrupt
-
-  //Initialize default animation routine
   
   //Power modes
   power_timer2_enable();                    //make sure timer2 is powered up
@@ -92,25 +98,21 @@ void dispSetup() {
   sleep_enable();                           //enable sleep instruction
 }
 
-// Animation Routines
-//====================
-
-
 // Interrupt Service Routines
 //============================
+//Timer2 output compare A interrupt
 ISR(TIMER2_COMPA_vect){                     //timer2 output compare A interrupt
   fields tmpBuf;                            //intermediate display buffer
 
-  digitalWrite(13, HIGH);                   //turn LED on during the execution of the ISR
+  //Debug code
+  //digitalWrite(13, HIGH);                 //turn LED on during the execution of the ISR
   //digitalWrite(13, !digitalRead(13));     //turn LED on during the execution of the ISR
 
   //Prepare next delay 
   //OCR2A += 15625/(6*DISP_FPS);             //set new delay
   OCR2A =  (dispColumn & 1) ?                //compensate for different brightness
-    OCR2A + ((15625*0.3)/(6*DISP_FPS)) :     //red
-    OCR2A + ((15625*1.7)/(6*DISP_FPS));      //green
-
-  //Serial.println("ISR!");
+    OCR2A + ((15625*1.7)/(6*DISP_FPS)) :     //green
+    OCR2A + ((15625*0.3)/(6*DISP_FPS));      //red
  
   //Drive previously calculated output
   PORTB |= 0x07;                            //turn off all LEDs
@@ -121,43 +123,52 @@ ISR(TIMER2_COMPA_vect){                     //timer2 output compare A interrupt
   dispColumn = ((dispColumn + 1) % 6);      //advance column indax
 
   //Update content
-  if ((!dispColumn) {                       //start of freame
+  if (!dispColumn) {                        //start of frame
     if (dispAnimator == NULL) {             //no custom animator
 
-    //Set solid pattern
-    dispRedBuf   = red;
-    dispGreenBuf = green;
+      //Set solid pattern
+      dispRedBuf   = red;
+      dispGreenBuf = green;
 
-    //Set scan pattern
-
-
-    
-    
+      //Highlighting
+      if (++dispHighlightCount > (DISP_FPS/2)) {//advance blink interval
+        dispHighlightCount = -(DISP_FPS/2);     //restart blink interval
+        dispHighlightIndex = 0x001;             //restart scan
+      } else if (dispHighlightCount > 0) {
   
+        //Set blink pattern
+        dispRedBuf   ^= blinkRed;
+        dispGreenBuf ^= blinkGreen;
 
-  
-  
-//  if ((!dispColumn) &&
-//      (dispAnimator != NULL)) {
-//    dispAnimator();   
-//#ifdef DISP_FIX
-//    tmpBuf       = dispRedBuf;            //handle swapped LEDs
-//    dispRedBuf   = 0x01FF & (( DISP_FIX & dispGreenBuf) | (~DISP_FIX & tmpBuf));
-//    dispGreenBuf = 0x01FF & ((~DISP_FIX & dispGreenBuf) | ( DISP_FIX & tmpBuf));
-//#endif
-//  }
-    
+        //Set scan pattern
+        if (!(dispHighlightCount % (DISP_FPS/(2*9)))) {//time to advance scan index
+          while (dispHighlightIndex &&         
+                (!(dispHighlightIndex & (scanRed | scanGreen)))) {
+            dispHighlightIndex <<= 1;
+          }
+          //Serial.println(dispHighlightIndex, BIN);
+          dispRedBuf   ^= (dispHighlightIndex & scanRed);
+          dispGreenBuf ^= (dispHighlightIndex & scanGreen);
+          dispHighlightIndex <<= 1;
+        }
+      }  
+    } else {  
+      //Run custom animation routine  
+      dispAnimator(&dispRedBuf, &dispGreenBuf);   
+    }
+  }
+
   //Calculate next port output
-  dispNextPortC = (0x20 >> dispColumn);     //set cathode column
+  dispNextPortC = (0x01 << dispColumn);     //set cathode column
   tmpBuf = (dispColumn & 1) ?
-    dispRedBuf   >> (dispColumn >> 1) :     //use red buffer
-    dispGreenBuf >> (dispColumn >> 1);      //use green buffer
+    dispGreenBuf >> (dispColumn >> 1) :     //use green buffer
+    dispRedBuf   >> (dispColumn >> 1);      //use red buffer
   dispNextPortB =
-    ~(((tmpBuf & 0x40) >> 4) |              //set top row
+    ~(((tmpBuf & 0x40) >> 6) |              //set top row
       ((tmpBuf & 0x08) >> 2) |              //set center row
-      ( tmpBuf & 0x01));                    //set bottom row
+      ( tmpBuf & 0x01) << 2);               //set bottom row
 
-  digitalWrite(13, LOW);                    //turn LED off
-
+  //Debug code
+  //digitalWrite(13, LOW);                  //turn LED off
 }
 

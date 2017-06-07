@@ -52,288 +52,153 @@
 #include <avr/power.h>
 #include "TicTacToe.h"
 
-// Target Check
-//==============
-#if defined(ARDUINO_AVR_UNO)
-#else
-#error Unsupported hardware
-#endif
+// Constants
+//===========
+#define KEYS_FIFODEPTH       8             //key strokes to be queued
+#define KEYS_DEBOUNCE_DELAY 35             //debounce delay [ms]
 
-//// Hidden Variables
-////==================
-//namespace {
-//  keyState      _keyState          = release; //key pad state
-//  unsigned char _keyBuf[FIFODEPTH] = { 0 };   //input FIFO
-//  unsigned char _keyBufIn          = 0;       //index of next free entry in FIFO
-//  unsigned char _keyBufOut         = 0;       //index of oldest entry in FIFO buffer
-//  fields        _dispBuf[2]        = { 0 };   //display buffer (0=red, 1=green)
-//  unsigned char _dispSubFrame      = 0;       //index of oldest entry in FIFO buffer  
-//  animCallback  _dispAnimate       = NULL;    //animation callback
-//}
-//
-//// Hidden Functions
-////==================
-//namespace {
-//  void isrTim2MatchA();                     //timer 2 compare match A handler
-//  void isrTim2MatchB();                     //timer 2 compare match B handler
-//  void isrPinChange2();                     //pin change interrupt 2 handler
-//}
-//
-//// Functions
-////===========
-////Driver setup
-//// args:   none
-//// result: none
-//void TicTacToeDrv::setup() {
-//  //Initialize timer 2
-//  //TCCR2A = 0;
-//  TCCR2B = (1 << CS22) |                    //set timer clock to 15.625kHz
-//           (1 << CS21) |
-//           (1 << CS20);
-//  //OCR2A  = TCNT2+(15625/(6*FRAMERATE));   //next match A in 1/(3*frame rate)
-//  OCR2B  = TCNT2;
-//  TIFR2  = (1 << OCF2B) |                   //clear output compare B interrupt flag
-//           (1 << OCF2A);                    //clear output compare A interrupt flag
-//  TIMSK2 = (1 << OCIE2A);                   //enable output compare A interrupt
-//  //ASSR   = 0;
-//  //GTCCR  = 0;
-//
-//  //Initialize the display
-//  PORTB    = 0xFF;
-//  PORTC    = 0xFF;
-//  DDRB     = 0x07;
-//  DDRC     = 0x3F;
-//  
-//  //Initialize pin change interrupt
-//  PORTD  = 0xE3;                            //drive PD[4:2] low
-//  DDRD   = 0x1C;                            //set PD[7:5] to input 
-//  PCMSK2 = 0xE0;                            //enable pin change interrupt on PD[7:5]
-//  PCIFR  = (1 << PCIF2);                    //clear pin change interrupt flag   
-//  PCICR  = (1 << PCIE2);                    //enable pin change interrupt
-//  isrPinChange2();                          //handle initial key pad state  
-//}
-////Wait for one keypad entry
-//// args:   none
-//// result: field associated with a key press
-//fields TicTacToeDrv::getKey() {
-//  //Local variables
-//  fields result;                            //return value
-//
-//  //Start of atomic sequence
-//  noInterrupts();                           //disable interrupts
-//  
-//  //Wait until there is data in the queue
-//  SMCR = (1 << SE);                         //enable idle mode
-//  while(_keyBufIn == _keyBufOut) {          //repeat while the buffer is empty
-//    WAIT_FOR_INTERRUPT();                   //wait for anything to happen
-//    noInterrupts();                         //disable interrupts
-//  }
-//  SMCR = 0x00;                              //disable SLEEP mode
-//  
-//  //End of atomic sequence
-//  interrupts();                             //enable interrupts
-//  
-//  //Unqueue key entry
-//  result     = (fields) (1 << _keyBuf[_keyBufOut]);//get result
-//  _keyBufOut = (_keyBufOut++)%FIFODEPTH;    //advance output pointer
-//
-//  return result;                            //return result
-//}
-//
-////Set red display fields 
-//// args:   fields
-//// result: none
-//void TicTacToeDrv::setRed(fields red) {
-//#ifdef CORRECTION
-//  _dispBuf[0] = 0b111111111 & ((~CORRECTION & red) | ( CORRECTION & _dispBuf[0]));
-//  _dispBuf[1] = 0b111111111 & (( CORRECTION & red) | (~CORRECTION & _dispBuf[1]));;
-//#else
-//  _dispBuf[0] = red;
-//#endif
-//}
-//
-////Set green display fields 
-//// args:   fields
-//// result: none
-//void TicTacToeDrv::setGreen(fields green) {
-//#ifdef CORRECTION
-//  _dispBuf[0] = 0b111111111 & (( CORRECTION & green) | (~CORRECTION & _dispBuf[0]));
-//  _dispBuf[1] = 0b111111111 & ((~CORRECTION & green) | ( CORRECTION & _dispBuf[1]));;
-//#else  
-//  _dispBuf[1] = green;
-//#endif
-//}
-//
-////Get red display fields 
-//// args:   none
-//// result: fields
-//fields TicTacToeDrv::getRed() {
-//  return _dispBuf[0];
-//}
-//
-////Get green display fields 
-//// args:   none
-//// result: fields
-//fields TicTacToeDrv::getGreen() {
-//  return _dispBuf[1];
-//}
-//
-////Set animation callback
-//// args:   none
-//// result: fields
-//void TicTacToeDrv::setAnimation(animCallback callback) {
-//  _dispAnimate = callback;
-//}
+// Variables                                
+//===========
+fields        keysBuf[KEYS_FIFODEPTH] = { 0 };        //input FIFO
+unsigned char keysBufIn               = 0;            //index of next free entry in FIFO
+unsigned char keysBufOut              = 0;            //index of oldest entry in FIFO buffer
+unsigned char keysDelay               = 0;            //extended debounce delay
+boolean       keysReady               = true;         //ready to detect keyboard input
 
-// ISRs
-//======
-//namespace {
-//  // Timer 2 compare match A handler
-//  //---------------------------------
-//  void isrTim2MatchA() {
-//    //Local variables
-//    fields        colRaw;                     //unformated column pattern
-//    unsigned char colPat;                     //formated column pattern
-//    unsigned char colNum;                     //column number
-//    unsigned char colSel;                     //column selector
-//    
-//    //Restart timer
-//    OCR2A += (15625/(6*FRAMERATE));           //set next timer delay
-//    //OCR2A += 5;           //set next timer delay
-//  
-//    //Calculate column selector and row pattern
-//    //Serial.print("_dispBuf:");
-//    //Serial.print(_dispBuf[0], BIN);
-//    //Serial.print(" ");
-//    //Serial.print(_dispBuf[1], BIN);
-//    //Serial.println("!");  
-//    colNum = _dispSubFrame%6;
-//    colSel = 0x20 >> colNum;
-//    colRaw = (_dispBuf[colNum & 1]) >> (colNum >> 1);
-//    colPat = ~(((colRaw & 0x40) >> 4) |
-//               ((colRaw & 0x08) >> 2) |
-//               ( colRaw & 0x01));
-//  
-//    //Apply column selector and row pattern
-//    //Serial.print("Display ColSel:");
-//    //Serial.print(colSel, HEX);
-//    //Serial.print(" ColNum:");
-//    //Serial.print(colNum, HEX);
-//    //Serial.print(" ColRaw:");
-//    //Serial.print(colRaw, HEX);
-//    //Serial.print(" ColPat:");
-//    //Serial.print(colPat, HEX);
-//    //Serial.println("!");  
-//    PORTC = 0;                                //deselect all columns                
-//    PORTB = colPat;                           //apply column pattern
-//    PORTC = colSel;                           //select column
-//
-//    //Advance subframe counter
-//    _dispSubFrame++;
-//    _dispSubFrame = _dispSubFrame % (6*(FRAMERATE/ANIMRATE));
-//     
-//    //Animation callback
-//    if ((_dispAnimate  != NULL) &&
-//        (_dispSubFrame == 0)){
-//      _dispAnimate();
-//    }    
-//  }
-//  
-//  // Timer 2 compare match B handler
-//  //---------------------------------
-//  void isrTim2MatchB() {
-//    //Local variables
-//    fields        keys;                       //captured keys
-//    unsigned char key;                        //key iterator
-//    
-//    //Capture keys
-//    PORTD  = 0xEF;                            //select row ABC   
-//    keys   = (PIND & 0xE0) >> 5;              //capture row ABC
-//    PORTD  = 0xF7;                            //select row DEF   
-//    keys  |= (PIND & 0xE0) >> 2;              //capture row DEF
-//    PORTD     = 0xFB;                         //select row GHI   
-//    keys  |= (PIND & 0xE0) << 1;              //capture row GHI
-//    PORTD     = 0xE3;                         //select all rows   
-//  
-//    //Parse captured keys
-//    key = 0;                                  //initialize iterator
-//    while (( keys      != 0) &&               //unparsed keys left
-//         ((keys & 1) == 0)) {               //current key is not pushed
-//      key++;                                  //increment iterator
-//      keys >>= 1;                             //shift to next key
-//    }
-//    if (keys == 1) {                          //input is valid
-//      //Queue valid input
-//      _keyBuf[_keyBufIn] = key;               //store key in keyBuf
-//      _keyBufIn = (_keyBufIn++)%FIFODEPTH;    //advance input pointer
-//      if (_keyBufIn == _keyBufOut) {          //check for overflow
-//        _keyBufOut = (_keyBufOut++)%FIFODEPTH;//delete oldest entry if necessary
-//      }
-//    }
-//  
-//    //Disable bebounce timer
-//    TIMSK2 = (1 << OCIE2A);                   //enable output compare A interrupt
-//  
-//    //Prepare next key input 
-//    _keyState  = release;                     //make sure all keys are released
-//    PCIFR  = (1 << PCIF2);                    //clear pin change interrupt flag   
-//    PCICR  = (1 << PCIE2);                    //enable pin change interrupt
-//    isrPinChange2();                          //handle initial key pad state    
-//  }
-//  
-//  // Pin change interrupt 2 handler
-//  //--------------------------------
-//  void isrPinChange2() {
-//    switch (_keyState) {
-//    case release:
-//      //Wait until all keys have been released
-//      if ((PIND & 0xE0) == 0xE0) {
-//        _keyState = detect;                            //wait until any key is pushed
-//      }
-//      break; 
-//    case detect:
-//      //Wait until any key is pushed
-//      if ((PIND & 0xE0) != 0xE0) {
-//        _keyState = debounce;                          //debounce key
-//        OCR2B  = TCNT2 + (7813 * DEBOUNCE / 1000);    //set debounce delay
-//        TIFR2  = (1 << OCF2B);                         //clear output compare B interrupt flag
-//        TIMSK2 = (1 << OCIE2B) |                       //enable output compare B interrupt
-//                 (1 << OCIE2A);                        //enable output compare A interrupt
-//        PCICR  = 0;                                    //disable pin change interrupt
-//      }
-//      break;
-//    }
-//  }
-//}
-//
-//// Connect Interrupt Service Routines
-////====================================
-////Timer2 output compare A interrupt
-//ISR(TIMER2_COMPA_vect){                    
-//  //Serial.println("TIM OC A interrupt start!");
-//  //Serial.print("TIM OC A start: ");
-//  //Serial.println(TCNT2);
-//  TIFR2 = (1 <<OCF2A);
-//  digitalWrite(13, HIGH);    // toggle LED
-//  //digitalWrite(13, ~digitalRead(13));    // toggle LED
-//  OCR2A += (15625/(6*FRAMERATE));           //set next timer delay
-//  //OCR2A += 200;
-//  //isrTim2MatchA();
-//  digitalWrite(13, LOW);    // toggle LED
-//  //Serial.print("TIM OC A end:");
-//  //Serial.println(TCNT2);
-//}
-//
-////Timer2 output compare B interrupt
-//ISR(TIMER2_COMPB_vect){                    
-////  Serial.println("TIM OC B interrupt start!");
-////  isrTim2MatchB();
-////  Serial.println("TIM OC B interrupt end!");
-//}
-//
-////Pin change interrupt 2
-//ISR(PCINT2_vect){                    
-////  Serial.println("Pin change interrupt start!");
-////  isrPinChange2();
-////  Serial.println("PIN change interrupt end!");
-//}
+// Setup routine
+//===============
+void keysSetup() {
+  //Initialize pin change interrupt
+  PORTD  = 0xE3;                            //drive PD[4:2] low
+  DDRD   = 0x1C;                            //set PD[7:5] to input 
+  PCMSK2 = 0xE0;                            //enable pin change interrupt on PD[7:5]
+  PCIFR  = (1 << PCIF2);                    //clear pin change interrupt flag   
+  PCICR  = (1 << PCIE2);                    //enable pin change interrupt
+}
+
+// Queue access
+//===============
+//Wait for one keypad entry
+// args:   none
+// result: field associated with a key press
+fields getKey() {
+  //Local variables
+  fields result;                            //return value
+
+  //Start of atomic sequence
+  noInterrupts();                           //disable interrupts
+  
+  //Wait until there is data in the queue
+  SMCR = (1 << SE);                         //enable idle mode
+  while(keysBufIn == keysBufOut) {          //repeat while the buffer is empty
+    WAIT_FOR_INTERRUPT();                   //wait for anything to happen
+    noInterrupts();                         //disable interrupts
+  }
+  SMCR = 0x00;                              //disable SLEEP mode
+  
+  //End of atomic sequence
+  interrupts();                             //enable interrupts
+  
+  //Unqueue key entry
+  result     = keysBuf[keysBufOut];         //get result
+  keysBufOut = (keysBufOut+1)%KEYS_FIFODEPTH;//advance output pointer
+
+  return result;                            //return result
+}
+
+// Interrupt Service xRoutines
+//============================
+//Timer2 output compare B interrupt
+ISR(TIMER2_COMPB_vect){                    
+  //Local variables
+  fields        keys;                       //captured keys
+  fields        key;                        //key iterator
+
+  //Debug code
+  //digitalWrite(13, HIGH);                 //turn LED on during the execution of the ISR
+  //digitalWrite(13, !digitalRead(13));     //turn LED on during the execution of the ISR
+  //Serial.println("Delay!");
+
+  if (--keysDelay <= 0) {                    //handle extended delay
+    keysDelay = 0;
+  
+    //Check if all keys have been released
+    if ((PIND & 0xE0) == 0xE0) {
+      //All pins released
+      TIMSK2    = (1 << OCIE2A);              //disable timer interrupt
+      keysReady = true;                       //ready for next input
+      
+      //Debug code
+      //Serial.print("Keypad ready again! ");
+      
+    } else if (keysReady) {    
+      keysReady = false;                      //input in process
+      
+      //Capture keys
+      PORTD  = 0xEF;                        //select row ABC   
+      NOP();
+      keys   = (~PIND & 0xE0) >> 5;         //capture row ABC
+      PORTD  = 0xF7;                        //select row DEF   
+      NOP();
+      keys  |= (~PIND & 0xE0) >> 2;         //capture row DEF
+      PORTD     = 0xFB;                     //select row GHI   
+      NOP();   
+      keys  |= (~PIND & 0xE0) << 1;         //capture row GHI
+      PORTD     = 0xE3;                     //select all rows   
+      
+      //Debug code
+      //Serial.print("Captured: ");
+      //Serial.println(keys, BIN);
+      
+      //Parse captured keys
+      key = 0x100;                          //initialize iterator
+      while (key) {                         //iterate through keys
+        if (key == keys) {                  //check if key has been pressed
+          break;                            //single key press detected
+        }
+        key >>= 1;                          //try next key
+      }
+      
+      //Debug code
+      //Serial.print("Parsed: ");
+      //Serial.println(key, BIN);
+      
+      if (key) {                            //input is valid              
+        //Queue valid input
+        keysBuf[keysBufIn] = key;                    //store key in keyBuf
+        keysBufIn = (keysBufIn+1)%KEYS_FIFODEPTH;    //advance input pointer
+        if (keysBufIn == keysBufOut) {               //check for overflow
+          keysBufOut = (keysBufOut+1)%KEYS_FIFODEPTH;//delete oldest entry if necessary
+        }
+      }
+      
+      //Debug code
+      //Serial.print("Queue in: ");
+      //Serial.print(keysBufIn);
+      //Serial.print(" out: ");
+      //Serial.println(keysBufOut);
+    } 
+  }
+    
+  //Debug code
+  //digitalWrite(13, LOW);                  //turn LED off
+}
+
+//Pin change interrupt 2
+ISR(PCINT2_vect){                    
+
+  //Debug code
+  //digitalWrite(13, HIGH);                 //turn LED on during the execution of the ISR
+  //digitalWrite(13, !digitalRead(13));     //turn LED on during the execution of the ISR
+  //Serial.println("Pin change!");
+
+  //Trigger debounce delay
+  OCR2B     = TCNT2;                           //~32ms debounce delay
+  keysDelay = KEYS_DEBOUNCE_DELAY/16;          //reset extended delay
+  TIFR2     = (1 << OCF2B);                    //clear output compare ABinterrupt flag
+  TIMSK2    = (1 << OCIE2A) |                  //enable output compare A interrupt
+              (1 << OCIE2B);                   //enable output compare A interrupt
+  
+  //Debug code
+  //digitalWrite(13, LOW);                  //turn LED off
+}

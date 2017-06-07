@@ -45,13 +45,15 @@ typedef unsigned int fields;
 
 // Variables                                
 //===========                                
-//
+//Display control
 fields  red;             //red fields on the board 
 fields  green;           //green fields on the board
 fields  scanRed;         //red fields, highligted as selectable 
 fields  scanGreen;       //green fields, highligted as selectable
 fields  blinkRed;        //red fields, highligted as winning move
 fields  blinkGreen;      //green fields, highligted as winning move
+//Custom animation routine
+void (*dispAnimator)(fields *red, fields *green) = NULL;//function pointer
 
 // Inline assembler
 //==================
@@ -60,6 +62,12 @@ fields  blinkGreen;      //green fields, highligted as winning move
 do {                                             \
   __asm__ __volatile__ ( "sei" "\n\t" :: );      \
   __asm__ __volatile__ ( "sleep" "\n\t" :: );    \
+} while(0)
+
+#define NOP()                                    \
+do {                                             \
+  __asm__ __volatile__ ( "nop" "\n\t" :: );      \
+  __asm__ __volatile__ ( "nop" "\n\t" :: );      \
 } while(0)
 
 #endif

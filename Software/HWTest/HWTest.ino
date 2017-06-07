@@ -51,23 +51,27 @@ void setup() {
 // -+-+-    +--------+--------+ 
 // D|E|F => |-------I|HGFEDCBA| 
 // -+-+-    +--------+--------+ 
-// G|H|I    IHGFEDCBA
-  red   = 0b001011110;
-  green = 0b011110100;
+// G|H|I         IHGFEDCBA
+  red        = 0b111111111;
+  green      = 0b000000000;
+  //blinkRed   = 0b000000000;
+  //blinkGreen = 0b000000000;
+  //scanRed    = 0b000000000;
+  //scanGreen  = 0b000000000;
   
   //Keypad
-  //keysSetup();
+  keysSetup();
 }
 
 // Application loop
 //==================
 void loop() {
-  //input = getKey();
-  //Serial.print("getKey: ");
-  //Serial.println(input);
+  input = getKey();
+  Serial.print("getKey: ");
+  Serial.println(input, BIN);
   
-  //setRed(  getRed()   ^ (getGreen() & input));
-  //setGreen(getGreen() ^               input);
-
+  red   = red ^ (green & input);
+  green =        green ^ input;
+  
   //digitalWrite(13, ~digitalRead(13));    // toggle LED
 }
