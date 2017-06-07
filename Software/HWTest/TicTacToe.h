@@ -24,16 +24,42 @@
 //#      - Initial release                                                      #
 //###############################################################################
 
-#include "TicTacToeDrv.h"
-using namespace TicTacToeDrv;
+// Target Check
+//==============
+#if defined(ARDUINO_AVR_UNO)
+#else
+#error Unsupported hardware
+#endif
 
 // Constants
 //===========
 
 // Type definitions
 //==================
+// A|B|C     15     8 7      0
+// -+-+-    +--------+--------+ 
+// D|E|F => |-------I|HGFEDCBA| 
+// -+-+-    +--------+--------+ 
+// G|H|I
+typedef unsigned int fields;  
+
+// Variables                                
+//===========                                
+//
+fields  red;             //red fields on the board 
+fields  green;           //green fields on the board
+fields  scanRed;         //red fields, highligted as selectable 
+fields  scanGreen;       //green fields, highligted as selectable
+fields  blinkRed;        //red fields, highligted as winning move
+fields  blinkGreen;      //green fields, highligted as winning move
 
 // Inline assembler
 //==================
+//Wait for any interrupt
+#define WAIT_FOR_INTERRUPT()                     \
+do {                                             \
+  __asm__ __volatile__ ( "sei" "\n\t" :: );      \
+  __asm__ __volatile__ ( "sleep" "\n\t" :: );    \
+} while(0)
 
 #endif

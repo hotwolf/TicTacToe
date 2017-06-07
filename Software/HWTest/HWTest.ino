@@ -1,5 +1,5 @@
 //###############################################################################
-//# TicTacToe - Driver Library                                                  #
+//# TicTacToe - Hardware Test                                                   #
 //###############################################################################
 //#    Copyright 2017 Dirk Heisswolf                                            #
 //#    This file is part of the TicTacToe project.                              #
@@ -17,56 +17,9 @@
 //#    You should have received a copy of the GNU General Public License        #
 //#    along with TicTacToe.  If not, see <http://www.gnu.org/licenses/>.       #
 //###############################################################################
-//# Display:                                                                    #
-//# ========                                                                    #
-//#                                                                             #
-//#  Cathodes:       +-+   +-+   +-+                                            #
-//#  PB2 ------------|A|---|B|---|C|                                            #
-//#                  +-+   +-+   +-+                                            #
-//#                   |     |     |                                             #
-//#                  +-+   +-+   +-+                                            #
-//#  PB1 ------------|D|---|E|---|F|                                            #
-//#                  +-+   +-+   +-+                                            #
-//#                   |     |     |                                             #
-//#                  +-+   +-+   +-+                                            #
-//#  PB0 ------------|G|---|H|---|I|                                            #
-//#                  +-+   +-+   +-+                                            #
-//#                   |     |     |                                             #
-//#  Anodes:          |     |     |                                             #
-//#  PC0 --red---+----+     |     |                                             #
-//#  PC1 --green-+          |     |                                             #
-//#                         |     |                                             #
-//#  PC2 --red---+----------+     |                                             #
-//#  PC3 --green-+                |                                             #
-//#                               |                                             #
-//#  PC4 --red---+----------------+                                             #
-//#  PC5 --green-+                                                              #
-//#                                                                             #
-//# Keypad:                                       +-------------------+         #
-//# =======                                       |  Wait until all   |         #
-//#                                               | keys are released |<--+     #
-//#  Rows:           +-+   +-+   +-+              +---------+---------+   |     #
-//#  PD4 ------------|A|---|B|---|C|                        |             |     #
-//#                  +-+   +-+   +-+                        V             |     #
-//#                   |     |     |               +---------+---------+   |     #
-//#                  +-+   +-+   +-+              |  Wait until any   |   |     #
-//#  PD3 ------------|D|---|E|---|F|              |  key is pressed   |   |     #
-//#                  +-+   +-+   +-+              +---------+---------+   |     #
-//#                   |     |     |                         |             |     #
-//#                  +-+   +-+   +-+                        V             |     #
-//#  PD2 ------------|G|---|H|---|I|              +---------+---------+   |     #
-//#                  +-+   +-+   +-+              |   Wait for the    |   |     #
-//#  Columns:         |     |     |               |  debounce delay   |   |     #
-//#  PD5 -------------+     |     |               +---------+---------+   |     #
-//#                         |     |                         |             |     #
-//#  PD6 -------------------+     |                         V             |     #
-//#                               |               +---------+---------+   |     #
-//#  PD7 -------------------------+               |  Scan keypad and  |   |     #
-//#                                               | queue keycode if  +---+     #
-//#                                               |the input is valid |         #
-//#                                               +---------+---------+         #
-//#                                                                             #
-//#                                                                             #
+//# This sketch is a basic hardware test for the TicTacToe shield. Coming out   #
+//# of reset, all red LEDs are lit. The green ones are cleared. Presseng a      #
+//# button will toggle the associated the associated LEDs.                      #
 //#                                                                             #
 //###############################################################################
 //# Version History:                                                            #
@@ -74,7 +27,7 @@
 //#      - Initial release                                                      #
 //###############################################################################
 
-#include "HWTest.h"
+#include "TicTacToe.h"
 
 // Variables
 //===========
@@ -83,16 +36,38 @@ fields input;
 // Setup routine
 //===============
 void setup() {
-  TicTacToeDrv::setup();
-  setRed(0x01FF);
-  setGreen(0x0000);
+  //Serial library
+  Serial.begin(9600);
+  Serial.println("Ready for debugging!");
+  
+  //Onboard LED
+  pinMode(13, OUTPUT);       // drive LED
+  digitalWrite(13, HIGH);    // turn the LED off
+  
+  //Display
+  dispSetup();
+
+// A|B|C     15     8 7      0
+// -+-+-    +--------+--------+ 
+// D|E|F => |-------I|HGFEDCBA| 
+// -+-+-    +--------+--------+ 
+// G|H|I    IHGFEDCBA
+  red   = 0b001011110;
+  green = 0b011110100;
+  
+  //Keypad
+  //keysSetup();
 }
 
 // Application loop
 //==================
 void loop() {
-  input = getKey();
-  setRed(  getRed()   ^ (getGreen() & input));
-  setGreen(getGreen() ^               input);
-}
+  //input = getKey();
+  //Serial.print("getKey: ");
+  //Serial.println(input);
+  
+  //setRed(  getRed()   ^ (getGreen() & input));
+  //setGreen(getGreen() ^               input);
 
+  //digitalWrite(13, ~digitalRead(13));    // toggle LED
+}
