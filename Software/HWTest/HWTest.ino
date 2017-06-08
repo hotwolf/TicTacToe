@@ -37,12 +37,12 @@ fields input;
 //===============
 void setup() {
   //Serial library
-  Serial.begin(9600);
-  Serial.println("Ready for debugging!");
+  //Serial.begin(9600);
+  //Serial.println("Ready for debugging!");
   
   //Onboard LED
-  pinMode(13, OUTPUT);       // drive LED
-  digitalWrite(13, HIGH);    // turn the LED off
+  //pinMode(13, OUTPUT);       // drive LED
+  //digitalWrite(13, HIGH);    // turn the LED off
   
   //Display
   dispSetup();

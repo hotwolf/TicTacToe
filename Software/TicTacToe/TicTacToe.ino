@@ -1,5 +1,5 @@
 //###############################################################################
-//# TicTacToe - Driver Library                                                  #
+//# TicTacToe - Game                                                            #
 //###############################################################################
 //#    Copyright 2017 Dirk Heisswolf                                            #
 //#    This file is part of the TicTacToe project.                              #
@@ -57,44 +57,48 @@ void setup() {
   Serial.begin(9600);
   Serial.println("Ready for debugging!");
 
-  //Display and keypad
-  TicTacToeDrv::setup();
-  noAnim(0x000000000, 0x000000000);
+  //Display
+  dispSetup();
+
+  //Keypad
+  keysSetup();
+
+  bannerStart();
 }
 
 // Application loop
 //==================
 void loop() {
-  //Select game
-  chooseGameBanner();
-  input = getKey();
-
-  //Determine players
-  if (input & 0b001001001) {
-    //Me 1st
-    greenIsHuman = true;
-    redIsHuman   = false;
-  } else if (input & 0b010010010) {
-    //Arduino 1st
-    greenIsHuman = false;
-    redIsHuman   = true;
-  } else {
-    //Two players
-    greenIsHuman = true;
-    redIsHuman   = true;
-  }
-  
-  //Determine rules
-  if (input & 0b000000111) {
-    //Classic
-    playClassic(greenIsHuman, redIsHuman);
-  } else if (input & 0b000111000) {
-    //Misere
-    playMisere(greenIsHuman, redIsHuman);
-  } else {
-    //Achi
-    playAchi(greenIsHuman, redIsHuman);
-  }
+//  //Select game
+//  chooseGameBanner();
+//  input = getKey();
+//
+//  //Determine players
+//  if (input & 0b001001001) {
+//    //Me 1st
+//    greenIsHuman = true;
+//    redIsHuman   = false;
+//  } else if (input & 0b010010010) {
+//    //Arduino 1st
+//    greenIsHuman = false;
+//    redIsHuman   = true;
+//  } else {
+//    //Two players
+//    greenIsHuman = true;
+//    redIsHuman   = true;
+//  }
+//  
+//  //Determine rules
+//  if (input & 0b000000111) {
+//    //Classic
+//    playClassic(greenIsHuman, redIsHuman);
+//  } else if (input & 0b000111000) {
+//    //Misere
+//    playMisere(greenIsHuman, redIsHuman);
+//  } else {
+//    //Achi
+//    playAchi(greenIsHuman, redIsHuman);
+//  }
 }
 
 
