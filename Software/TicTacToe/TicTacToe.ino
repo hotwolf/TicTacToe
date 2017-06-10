@@ -63,7 +63,7 @@ void setup() {
   //Keypad
   keysSetup();
 
-  bannerStart();
+  textShow("PICK GAME   ", false, true, true);
 }
 
 // Application loop
