@@ -31,111 +31,144 @@
 
 #include "TicTacToe.h"
 
-//// Play
-////======
-////Play the classic game
-//// args:   greenIsHuman: true if green player is human
-////         redIsHuman:   true if red player is human  
-//// result: none
-//void playClassic (bool greenIsHuman, bool redIsHuman) {
-//  //Board
-//  fields red   = 0b000000000;  //set of red marks on the board
-//  fields green = 0b000000000;  //set of green marks on the board
-//  
-//  //Game loop
-//  while (1) {
-//
-//    //Green move
-//    //==========
-//    green |= makeMoveClassic(greenIsHuman, green, red, red , green);
-//    noAnim(red, green);
-//
-//    //Check board
-//    //===========
-//    if (checkBoardClassic(red, green)) {
-//      break;
-//    }
-//
-//    //Red move
-//    //========
-//    red |= makeMoveClassic(redIsHuman, red, green, red , green);
-//    noAnim(red, green);
-//
-//    //Check board
-//    //===========
-//    if (checkBoardClassic(red, green)) {
-//      break;
-//    }
-//  }
-//
-//  //Wait for input to continue and clear the sisplay
-//  getKey();
-//  noAnim(0b000000000, 0b000000000);
-//}
-//   
-////Make one move in the classic game
-//// args:   isHuman:  true if current player is human
-////         player:   marks of current player
-////         opponent: marks of the opponent 
-////         red:      all red marks
-////         green:    all green marks
-//// result: new mark to be placed
-//fields makeMoveClassic(bool isHuman, fields player, fields opponent, fields red , fields green) {
-//  fields tmp   = 0b000000000;  //temporary storage
-//    
-//  if (isHuman) {
-//    //Wait for input
-//    return selectField(red, green, inverseOf(red|green)); 
-//  } else {
-//    //Try to complete one row
-//    tmp = completingDrops(player, opponent);
-//    if (tmp) {
-//      return oneOf(tmp);
-//    } else {
-//      //Prevent opponent from completing one row
-//      tmp = completingDrops(opponent, player);
-//      if (tmp) {
-//	return oneOf(tmp);
-//      } else {
-//	//Occupy the center if possible
-//	if (isCenterFree(red|green)) {
-//	  return 0b000010000;
-//	} else {
-//	  //Make random move
-//	  return oneOf(inverseOf(red|green));
-//	}
-//      }
-//    }   
-//  }
-//}
-//  
-////Check the status of the board
-//// args:   red:   all red marks
-////         green: all green marks
-//// result: True if the game is over
-//bool checkBoardClassic(fields red , fields green) {
-//  fields tmp   = 0b000000000;  //temporary storage
-//
-//  //Check if green won
-//  tmp = completedRowsIn(green);
-//  if (tmp) {
-//    //Signal victory
-//    blink(red, green, tmp);
-//    return true;
-//  }
-//
-//  //Check if red won
-//  tmp = completedRowsIn(red);
-//  if (tmp) {
-//    //Signal victory
-//    blink(red, green, tmp);
-//    return true;
-//  }
-//
-//  //Check for a tie
-//  if ((red|green) == 0x111111111) {
-//    return true;
-//  }
-//    
-//  return false;
-//}
+// Play
+//======
+//Play the classic game
+// args:   none 
+// result: none
+void classicPlay () {
+  //Game loop
+  while (1) {
+
+    //Green move
+    //==========
+    green |= classicTurn(greenTurn);         //place green piece
+    if (blinkGreen = completeRows(green)) {  //check if green has won
+      break;
+    } else if ((red|green) == 0b111111111) { //check for tie
+      blinkRed   = 0b111111111;              //flash all LEDs
+      blinkGreen = 0b111111111;
+      break; 
+    }
+  
+    //Red move
+    //========
+    red |= classicTurn(redTurn);             //place red piece
+    if (blinkRed = completeRows(red)) {      //check if green has won
+      break;
+    } else if ((red|green) == 0b111111111) { //check for tie
+      blinkRed   = 0b111111111;              //flash all LEDs
+      blinkGreen = 0b111111111;
+      break;
+    }
+  }
+}
+   
+//One turn of the classic game
+// args:   color
+// result: new mark to be placed
+fields classicTurn(turn currentTurn) { 
+  if ((currentTurn == greenTurn) ? greenIsHuman : redIsHuman) {
+    return classicHumanTurn(currentTurn);
+  } else {
+    return classicComputerTurn(currentTurn);
+  }
+}
+
+//Human turn in the classic game
+// args:   color
+fields classicHumanTurn(turn currentTurn) {
+  fields free   = inverseOf(red | green);
+  fields input;
+
+  //Serial.println("classicHumanTurn!");
+  //Serial.print("turn: ");
+  //Serial.println((currentTurn == greenTurn) ? "GREEN" : "RED");
+  //Serial.print("red: ");
+  //Serial.println(red, BIN);
+  //Serial.print("green: ");
+  //Serial.println(green, BIN);
+  
+  //Highlight free fields
+  if (currentTurn == greenTurn) {
+    scanGreen = free;
+  } else {
+    scanRed   = free;
+  } 
+
+  //Get valid input
+  do {
+    input = getKey();
+
+  //Serial.print("Key input: ");
+  //Serial.print(input, BIN);
+  //Serial.print(" free: ");
+  //Serial.println(free, BIN);
+
+  } while (!(input & free));
+
+  //Serial.print("result: ");
+  //Serial.println(input, BIN);
+
+  //Clear highlights
+  scanGreen = 0;
+  scanRed   = 0;
+
+  return input;
+}
+    
+//Computer turn in the classic game
+// args:   color
+fields classicComputerTurn(turn currentTurn) {
+  fields player   = (currentTurn == greenTurn) ? green : red;
+  fields opponent = (currentTurn == greenTurn) ? red   : green;
+  fields free     = inverseOf(red | green);
+  fields options;
+
+  //Serial.println("classicComputerTurn!");
+  //Serial.print("red: ");
+  //Serial.println(red, BIN);
+  //Serial.print("green: ");
+  //Serial.println(green, BIN);
+
+  
+  //Complete a row if possible
+  if (options = completingDrops(player, opponent)) {
+
+    //Serial.print("win: ");
+    //Serial.println(options, BIN);
+
+    return oneOf(options);
+  }
+
+  //Prevent the opponent from completing a row
+  if (options = completingDrops(opponent, player)) {
+
+    //Serial.print("defend: ");
+    //Serial.println(options, BIN);
+
+    return oneOf(options);
+  }
+
+  //Occupy the center if possible
+  if (0b000010000 & free) {
+
+    //Serial.println("center");
+
+    return 0b000010000;
+  }
+
+  //Occupy a corner if possible
+  if (options = (0b101000101 & free)) {
+
+    //Serial.println("corner");
+
+    return oneOf(options);
+  }
+
+   //Pick a random field
+
+    //Serial.println("random");
+
+    return oneOf(free);
+}

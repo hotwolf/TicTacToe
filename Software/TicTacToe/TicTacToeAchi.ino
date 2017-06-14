@@ -38,7 +38,8 @@
 //// args:   greenIsHuman: true if green player is human
 ////         redIsHuman:   true if red player is human  
 //// result: none
-//void playAchi (bool greenIsHuman, bool redIsHuman) {
+void achiPlay() {
+}
 //  //Board
 //  fields red   = 0b000000000;  //set of red marks on the board
 //  fields green = 0b000000000;  //set of green marks on the board

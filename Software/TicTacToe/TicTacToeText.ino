@@ -17,6 +17,14 @@
 //#    You should have received a copy of the GNU General Public License        #
 //#    along with TicTacToe.  If not, see <http://www.gnu.org/licenses/>.       #
 //###############################################################################
+//# Special characters in strings:                                              #
+//#    \x80 Loop string output                                                  #
+//#    \x81 Use red LEDs                                                        #
+//#    \x82 Use green LEDs                                                      #
+//#    \x83 Use red and green LEDs                                              #
+//#    \x84 Mark the beginning of the loop                                      #
+//#                                                                             #
+//###############################################################################
 //# Version History:                                                            #
 //#    March 24, 2017                                                           #
 //#      - Initial release                                                      #
@@ -204,22 +212,20 @@ const fields textFontTable[]PROGMEM = {0b000010000, // 0b00 NUL ... ... ... ...
 byte    textFrameCount;  //determines the duration of each displayed character
 char    *textStart;      //start of the string
 char    *textRemaining;  //current position of the string
-boolean textRed;         //set to true, to loop text display 
-boolean textGreen;       //set to true, to loop text display 
-boolean textLoop;        //set to true, to loop text display 
+boolean textRed;         //display text with red LEDs
+boolean textGreen;       //display text with green LEDs
 
 // Banner control
 //================
 //Show a string once
 // args:   none
 // result: nons
-void textShow(char *text, boolean red, boolean green, boolean loop) {
+void textShow(char *text) {
   textFrameCount = FRAMERATE;
   textStart      = text;
   textRemaining  = text;
-  textRed        = red;
-  textGreen      = green;
-  textLoop       = loop;
+  textRed        = false;
+  textGreen      = true;
   dispAnimator   = textAnimator; 
 }
 
@@ -236,6 +242,40 @@ void textAnimator(fields *redBuf, fields *greenBuf) {
   //Serial.print("Animator :");
   //Serial.println(textFrameCount);
   
+  //Handle special characters
+  if (*textRemaining <= 0) {
+    //Serial.print("Special :");
+    //Serial.println(*textRemaining, HEX);
+    //Handle escape characters
+    while (((*textRemaining & 0xFF) == 0x80) ||
+	   ((*textRemaining & 0xFF) == 0x81) ||
+	   ((*textRemaining & 0xFF) == 0x82) ||
+	   ((*textRemaining & 0xFF) == 0x83) ||
+	   ((*textRemaining & 0xFF) == 0x84)) {
+      if ((*textRemaining & 0xFF) == 0x80) {
+	//Loop
+	textRemaining = textStart;
+      }
+      if ((*textRemaining & 0xFF) == 0x84) {
+	//Set loop marker
+	textStart = ++textRemaining;
+      } else {
+	//Set color
+	textRed   = (*textRemaining & 0x01) ? true : false;
+	textGreen = (*textRemaining & 0x02) ? true : false;
+	textRemaining++;                     //advance to next character    
+      }
+    }    
+    //Handle end of string
+    if (*textRemaining == 0) {
+      //Stop text display
+      dispAnimator = NULL;
+      *redBuf   = 0;
+      *greenBuf = 0;
+    }
+  }
+    
+  //Display character
   if (textFrameCount > (FRAMERATE/16)) {
     //Display character
     //Serial.println("Char!");
@@ -244,27 +284,17 @@ void textAnimator(fields *redBuf, fields *greenBuf) {
     *greenBuf = textGreen ? pattern : 0;
   } else {
     //Blank diaplay
-    //Serial.println("Blank!");
     *redBuf   = 0;
     *greenBuf = 0;
   }
-    
+  
+  //Character timing
   if (textFrameCount > 0) {
     textFrameCount--;
   } else {
     //Switch to next character
-    //Serial.println("Switch!");
-    textRemaining++;           //advance to next character
-    if (*textRemaining == '\0') {       //end of string found
-      if (textLoop) {
-	//Loop text
-	textRemaining = textStart;
-      } else {
-	//Stop text display
-	dispAnimator = NULL;
-      } 
-    }
+    textRemaining++;                     //advance to next character    
     textFrameCount = FRAMERATE;
-  }   
+  }
 }
 

@@ -33,7 +33,6 @@
 
 // Constants
 //===========
-#define FRAMERATE  120              //refresh rate [fps]
 
 // Type definitions
 //==================
@@ -42,25 +41,19 @@
 // D|E|F => |-------I|HGFEDCBA| 
 // -+-+-    +--------+--------+ 
 // G|H|I
-typedef unsigned int fields;
-
-typedef enum {greenTurn, redTurn} turn;
+typedef unsigned int fields;  
 
 // Variables                                
 //===========                                
 //Display control
-fields  red        = 0; //red fields on the board 
-fields  green      = 0; //green fields on the board
-fields  scanRed    = 0; //red fields, highligted as selectable 
-fields  scanGreen  = 0; //green fields, highligted as selectable
-fields  blinkRed   = 0; //red fields, highligted as winning move
-fields  blinkGreen = 0; //green fields, highligted as winning move
+fields  red;             //red fields on the board 
+fields  green;           //green fields on the board
+fields  scanRed;         //red fields, highligted as selectable 
+fields  scanGreen;       //green fields, highligted as selectable
+fields  blinkRed;        //red fields, highligted as winning move
+fields  blinkGreen;      //green fields, highligted as winning move
 //Custom animation routine
 void (*dispAnimator)(fields *red, fields *green) = NULL;//function pointer
-//Game settings
-bool greenIsHuman  = true;
-bool redIsHuman    = false;
-
 
 // Inline assembler
 //==================

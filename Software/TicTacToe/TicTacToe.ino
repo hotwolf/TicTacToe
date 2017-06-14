@@ -47,9 +47,7 @@
 // Variables
 //===========
 fields input;
-bool greenIsHuman;
-bool redIsHuman;
-
+  
 // Setup routine
 //===============
 void setup() {
@@ -57,48 +55,63 @@ void setup() {
   Serial.begin(9600);
   Serial.println("Ready for debugging!");
 
+  //Random seed
+  randomSeed(analogRead(0));
+  
   //Display
   dispSetup();
 
   //Keypad
   keysSetup();
 
-  textShow("PICK GAME   ", false, true, true);
+  //Intro
+  //        green    red    green     loop
+  //          V       V       V        V 
+  textShow("\x82TIC \x81TAC \x82TOE  \x80");
+  input = getKey();
+  textStop();
+
 }
 
 // Application loop
 //==================
 void loop() {
-//  //Select game
-//  chooseGameBanner();
-//  input = getKey();
-//
-//  //Determine players
-//  if (input & 0b001001001) {
-//    //Me 1st
-//    greenIsHuman = true;
-//    redIsHuman   = false;
-//  } else if (input & 0b010010010) {
-//    //Arduino 1st
-//    greenIsHuman = false;
-//    redIsHuman   = true;
-//  } else {
-//    //Two players
-//    greenIsHuman = true;
-//    redIsHuman   = true;
-//  }
-//  
-//  //Determine rules
-//  if (input & 0b000000111) {
-//    //Classic
-//    playClassic(greenIsHuman, redIsHuman);
-//  } else if (input & 0b000111000) {
-//    //Misere
-//    playMisere(greenIsHuman, redIsHuman);
-//  } else {
-//    //Achi
-//    playAchi(greenIsHuman, redIsHuman);
-//  }
-}
+  //Clear display
+  red        = 0;
+  green      = 0;
+  scanRed    = 0;
+  scanGreen  = 0;
+  blinkRed   = 0;
+  blinkGreen = 0;
+  
+  //Determine players
+  if (input & 0b001001001) {
+    //Me 1st
+    greenIsHuman = true;
+    redIsHuman   = false;
+  } else if (input & 0b010010010) {
+    //Arduino 1st
+    greenIsHuman = false;
+    redIsHuman   = true;
+  } else {
+    //Two players
+    greenIsHuman = true;
+    redIsHuman   = true;
+  }
+  
+  //Start Game
+  if (input & 0b000000111) {
+    //Classic
+    classicPlay();
+  } else if (input & 0b000111000) {
+    //Misere
+    miserePlay();
+  } else {
+    //Achi
+    achiPlay();
+  }
 
+  //Next game
+  input = getKey();
+}
 

@@ -31,108 +31,112 @@
 
 #include "TicTacToe.h"
 
-//// Play
-////======
-////Play Misere
-//// args:   greenIsHuman: true if green player is human
-////         redIsHuman:   true if red player is human  
-//// result: none
-//void playMisere (bool greenIsHuman, bool redIsHuman) {
-//  //Board
-//  fields red   = 0b000000000;  //set of red marks on the board
-//  fields green = 0b000000000;  //set of green marks on the board
-//  
-//  //Game loop
-//  while (1) {
+// Play
+//======
+//Play Misere
+// args:   greenIsHuman: true if green player is human
+//         redIsHuman:   true if red player is human  
+// result: none
+void miserePlay() {
+  //Game loop
+  while (1) {
+
+    //Green move
+    //==========
+    green |= misereTurn(greenTurn);      //place green piece
+    if (blinkRed = completeRows(green)) {//check if green has won
+      break;
+    } else if ((red|green) == 0b111111111) { //check for tie
+      blinkRed   = 0b111111111;              //flash all LEDs
+      blinkGreen = 0b111111111;
+      break;
+    }
+  
+    //Red move
+    //========
+    red |= misereTurn(redTurn);                  //place red piece
+    if (blinkGreen = completeRows(red)) {    //check if green has won
+      break;
+    } else if ((red|green) == 0b111111111) { //check for tie
+      blinkRed   = 0b111111111;              //flash all LEDs
+      blinkGreen = 0b111111111;
+      break;
+    }
+  }
+
+}
+
+//One turn of the Misere game
+// args:   color
+// result: new mark to be placed
+fields misereTurn(turn currentTurn) { 
+  if ((currentTurn == greenTurn) ? greenIsHuman : redIsHuman) {
+    return classicHumanTurn(currentTurn);
+  } else {
+    return misereComputerTurn(currentTurn);
+  }
+}
+
+//Computer turn in the classic game
+// args:   color
+fields misereComputerTurn(turn currentTurn) {
+  fields player   = (currentTurn == greenTurn) ? green : red;
+  fields opponent = (currentTurn == greenTurn) ? red   : green;
+  fields optione  = inverseOf(red | green);
+  fields options;
+
+  Serial.println("misereComputerTurn!");
+  Serial.print("red: ");
+  Serial.println(red, BIN);
+  Serial.print("green: ");
+  Serial.println(green, BIN);
+ 
+//  //Avoid completing a row
+//  if (options = completingDrops(player, opponent)) {
 //
-//    //Green move
-//    //==========
-//    green |= makeMoveMisere(greenIsHuman, green, red, red , green);
-//    noAnim(red, green);
+//    Serial.print("win: ");
+//    Serial.println(options, BIN);
 //
-//    //Check board
-//    //===========
-//    if (checkBoardMisere(red, green)) {
-//      break;
-//    }
-//
-//    //Red move
-//    //========
-//    red |= makeMoveMisere(redIsHuman, red, green, red , green);
-//    noAnim(red, green);
-//   
-//    //Check board
-//    //===========
-//    if (checkBoardMisere(red, green)) {
-//      break;
-//    }
+//    return oneOf(options);
 //  }
 //
-//  //Wait for input to continue and clear the sisplay
-//  getKey();
-//  noAnim(0b000000000, 0b000000000);
-//}
-//   
-////Make one move in the classic game
-//// args:   isHuman:  true if current player is human
-////         player:   marks of current player
-////         opponent: marks of the opponent 
-////         red:      all red marks
-////         green:    all green marks
-//// result: new mark to be placed
-//fields makeMoveMisere(bool isHuman, fields player, fields opponent, fields red , fields green) {
-//  fields remainingMoves = inverseOf(red|green); //pick the best one out of these fields
-//  fields tmp            = 0b000000000;       //temporary storage
-//  
-//  if (isHuman) {
-//    //Wait for input
-//    return selectField(red, green, inverseOf(red|green)); 
-//  } else {
-//    //Exclude loosing moves if possible
-//    tmp = remainingMoves & inverseOf(completingDrops(player, opponent));
-//    if (tmp) {
-//      remainingMoves = tmp;               //continue selection
-//    }
-//    //Keep opponent's completable rows open
-//    tmp = remainingMoves & inverseOf(completingDrops(opponent, player));
-//    if (tmp) {
-//      remainingMoves = tmp;               //continue selection
-//    }
-//    //Don't select the center 
-//    tmp = remainingMoves & 0b111101111;
-//    if (tmp) {
-//      remainingMoves = tmp;               //continue selection
-//    }
-//    //return one of the remaining fields
-//    return oneOf(remainingMoves);
-//  }
-//}
-//  
-////Check the status of the board
-//// args:   red:   all red marks
-////         green: all green marks
-//// result: True if the game is over
-//bool checkBoardMisere(fields red , fields green) {
-//  fields tmp   = 0b000000000;  //temporary storage
+//  //Prevent the opponent from completing a row
+//  if (options = completingDrops(opponent, player)) {
 //
-//  //Check if green won
-//  if (completedRowsIn(red)) {
-//    //Signal victory
-//    blink(red, green, green);
-//    return true;
+//    Serial.print("defend: ");
+//    Serial.println(options, BIN);
+//
+//    return oneOf(options);
 //  }
 //
-//  //Check if red won
-//  if (completedRowsIn(green)) {
-//    //Signal victory
-//    blink(red, green, red);
-//    return true;
+//  //Occupy the center if possible
+//  if (0b000010000 & free) {
+//
+//    Serial.println("center");
+//
+//    return 0b000010000;
 //  }
 //
-//  //Check for a tie
-//  if ((red|green) == 0x111111111) {
-//    return true;
+//  //Occupy a corner if possible
+//  if (options = (0b101000101 & free)) {
+//
+//    Serial.println("corner");
+//
+//    return oneOf(options);
 //  }
-//    
-//  return false;
-//}
+
+   //Pick a random field
+
+    Serial.println("random");
+
+    return oneOf(options);
+}
+
+  // ...
+
+
+
+
+
+
+
