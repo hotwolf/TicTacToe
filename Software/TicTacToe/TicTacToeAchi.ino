@@ -32,150 +32,187 @@
 
 #include "TicTacToe.h"
 
-//// Play
-////======
-////Play the classic game
-//// args:   greenIsHuman: true if green player is human
-////         redIsHuman:   true if red player is human  
-//// result: none
+// Play
+//======
+//Play the classic game
+// args:   greenIsHuman: true if green player is human
+//         redIsHuman:   true if red player is human  
+// result: none
 void achiPlay() {
+  //Variables
+  boolean gameOver = false;
+
+  Serial.println("Achi!");
+
+  
+  //8 turns of drop game
+  for (int i = 0; i < 4; i++) {
+
+    //Green move
+    //==========
+    green |= classicTurn(greenTurn);         //place green piece
+    if (blinkGreen = completeRows(green)) {  //check if green has won
+      gameOver = true;
+      break;
+    } else if ((red|green) == 0b111111111) { //check for tie
+      blinkRed   = 0b111111111;              //flash all LEDs
+      blinkGreen = 0b111111111;
+      gameOver = true;
+      break; 
+    }
+  
+    //Red move
+    //========
+    red |= classicTurn(redTurn);             //place red piece
+    if (blinkRed = completeRows(red)) {      //check if green has won
+      gameOver = true;
+      break;
+    } else if ((red|green) == 0b111111111) { //check for tie
+      blinkRed   = 0b111111111;              //flash all LEDs
+      blinkGreen = 0b111111111;
+      gameOver = true;
+      break;
+    }
+  }
+  //Start shift game in case of a tie
+  if (!gameOver) {
+    
+    //Shift game
+    while (1) {
+      fields achiMove;
+      
+      //Green move
+      //==========
+      if (achiMove = achiTurn(greenTurn)){   //shift green piece
+	
+	green = shift(green, achiMove, inverseOf(red | green));//update fields
+	
+	if (blinkGreen = completeRows(green)) {  //check if green has won
+	  break;
+	}
+
+      } else {
+	blinkRed = red;                      //green can't move => red won
+	break;
+      }
+      
+      //Red move
+      //========
+      if (achiMove = achiTurn(redTurn)){     //shift green piece
+	
+	red = shift(red, achiMove, inverseOf(red | green));//update fields
+	
+	if (blinkRed = completeRows(red)) {  //check if green has won
+	  break;
+	}
+
+      } else {
+	blinkGreen = green;                  //red can't move => green won
+	break;
+      }
+
+    }
+  }
 }
-//  //Board
-//  fields red   = 0b000000000;  //set of red marks on the board
-//  fields green = 0b000000000;  //set of green marks on the board
-//  fields shift = 0b000000000;  //valid fields for shifting
-//  
-//  //Game loop
-//  while (1) {
-//    //Play the classic rules for the first eight moves
-//    //================================================
-//    if (countOf(red|green) < 8) {
-//    
-//      //Classic green move
-//      //==================
-//      green |= makeMoveClassic(greenIsHuman, green, red, red , green);
-//      noAnim(red, green);
-//      
-//      //Check board
-//      //===========
-//      if (checkBoardAchi(red, green)) {
-//	break;
-//      }
-//
-//      //Classic Red move
-//      //================
-//      red |= makeMoveClassic(redIsHuman, red, green, red , green);
-//      noAnim(red, green);
-//     
-//      //Check board
-//      //===========
-//      if (checkBoardAchi(red, green)) {
-//	break;
-//      }
-//    } else {
-//      //Play the Achi rules for the rest of the game
-//      //============================================
-//      //Green Achi move
-//      //================
-//      shift = makeMoveAchi(greenIsHuman, green, red, red , green);
-//      if (shift) {
-//	green |= inverseOf(red|green);  //mark empty field
-//	green &= inverseOf(shift);      //clear shifted field
-//      }
-//      noAnim(red, green);
-//      
-//      //Check board
-//      //===========
-//      if (checkBoardAchi(red, green)) {
-//	break;
-//      }
-//
-//      //Green Achi move
-//      //================
-//      shift = makeMoveClassic(greenIsHuman, green, red, red , green);
-//      if (shift) {
-//	green |= inverseOf(red|green);  //mark empty field
-//	green &= inverseOf(shift);      //clear shifted field
-//      }
-//      noAnim(red, green);
-//      
-//      //Check board
-//      //===========
-//      if (checkBoardAchi(red, green)) {
-//	break;
-//      }
-//    }
-//  }
-//
-//  //Wait for input to continue and clear the sisplay
-//  getKey();
-//  noAnim(0b000000000, 0b000000000);
-//}
-//   
-////Make one move in the classic game
-//// args:   isHuman:  true if current player is human
-////         player:   marks of current player
-////         opponent: marks of the opponent 
-////         red:      all red marks
-////         green:    all green marks
-//// result: mark to be shifted into the empty spot
-//fields makeMoveAchi(bool isHuman, fields player, fields opponent, fields red , fields green) {
-//  fields tmp   = 0b000000000;  //temporary storage
-//  
-//  if (isHuman) {
-//    tmp = validShifts(player, opponent);
-//    if (tmp) {    
-//      //Wait for input
-//      return selectField(red, green, tmp);
-//    } else {
-//      //Can't move -> skip turn
-//      return 0x000000000;
-//    } 
-//  } else {
-//    //Try to complete one row
-//    tmp = completingShifts(player, opponent);
-//    if (tmp) {
-//      return oneOf(tmp);
-//    } else {
-//      //Avoid shifts, that allow the opponent to win
-//      tmp = validShifts(player, opponent) & inverseOf(badShifts(player, opponent));
-//      if (tmp) {
-//	return oneOf(tmp);
-//      } else {
-//	//See if any move is possible at all
-//	tmp = validShifts(player, opponent);
-//	if (tmp) {
-//	  return oneOf(tmp);
-//	} else {
-//	  //Can't move -> skip turn
-//	  return 0x000000000;
-//	}
-//      }
-//    }
-//  }
-//}
-//  
-////Check the status of the board
-//// args:   red:   all red marks
-////         green: all green marks
-//// result: True if the game is over
-//bool checkBoardAchi(fields red , fields green) {
-//  fields tmp   = 0b000000000;  //temporary storage
-//
-//  //Check if green won
-//  tmp = completedRowsIn(green);
-//  if (tmp) {
-//    //Signal victory
-//    blink(red, green, tmp);
-//    return true;
-//  }
-//
-//  //Check if red won
-//  tmp = completedRowsIn(red);
-//  if (tmp) {
-//    //Signal victory
-//    blink(red, green, tmp);
-//    return true;
-//  }
-//  return false;
-//}
+     
+//One turn of the shift game
+// args:   color
+// result: new mark to be placed
+fields achiTurn(turn currentTurn) { 
+  fields player   = (currentTurn == greenTurn) ? green : red;
+  fields opponent = (currentTurn == greenTurn) ? red   : green;
+  fields free     = inverseOf(red | green);
+  fields options  = neighborsOf(free) & player;
+
+  //Check if there are any moves left
+  if (options) {
+
+    //Human or computer turn
+    if ((currentTurn == greenTurn) ? greenIsHuman : redIsHuman) {
+      return achiHumanTurn(currentTurn);
+    } else {
+      return achiComputerTurn(currentTurn);
+    }
+    
+  } else {
+
+    return 0; //no move left
+    
+  }
+}
+
+//Human turn in the shift game
+// args:   color
+fields achiHumanTurn(turn currentTurn) {
+  fields player   = (currentTurn == greenTurn) ? green : red;
+  fields opponent = (currentTurn == greenTurn) ? red   : green;
+  fields free     = inverseOf(red | green);
+  fields options  = neighborsOf(free) & player;
+  
+  //Serial.println("achiHumanTurn!");
+  //Serial.print("turn: ");
+  //Serial.println((currentTurn == greenTurn) ? "GREEN" : "RED");
+  //Serial.print("red: ");
+  //Serial.println(red, BIN);
+  //Serial.print("green: ");
+  //Serial.println(green, BIN);
+
+  //Highlight options
+  if (currentTurn == greenTurn) {
+    scanGreen = options;
+  } else {
+    scanRed = options;
+  }
+ 
+  //Get valid input
+  do {
+    input = getKey();
+    
+    //Serial.print("Key input: ");
+    //Serial.print(input, BIN);
+    //Serial.print(" free: ");
+    //Serial.println(free, BIN);
+      
+  } while (!(input & options));
+
+  //Serial.print("result: ");
+  //Serial.println(input, BIN);
+    
+  //Clear highlights
+  scanGreen = 0;
+  scanRed   = 0;
+  
+  return input;
+
+}
+
+//Computer turn in the shift game
+// args:   color
+fields achiComputerTurn(turn currentTurn) { 
+  fields player   = (currentTurn == greenTurn) ? green : red;
+  fields opponent = (currentTurn == greenTurn) ? red   : green;
+  fields free     = inverseOf(red | green);
+  fields options  = neighborsOf(free) & player;
+  fields iterator;   //field iterator
+  
+  //Serial.println("achiComputerTurn!");
+  //Serial.print("red: ");
+  //Serial.println(red, BIN);
+  //Serial.print("green: ");
+  //Serial.println(green, BIN);
+
+  //Try to complete a row
+  for (iterator = 0b000000001;
+       iterator < 0b111111111;
+       iterator <<= 1) {
+    if (options & iterator) {      
+      if (completeRows(shift(player, iterator, free))) {
+	return iterator;
+      }
+    }
+  }
+
+  //Pick a random field
+   return oneOf(options);
+  
+}

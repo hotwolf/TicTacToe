@@ -82,57 +82,41 @@ fields misereTurn(turn currentTurn) {
 fields misereComputerTurn(turn currentTurn) {
   fields player   = (currentTurn == greenTurn) ? green : red;
   fields opponent = (currentTurn == greenTurn) ? red   : green;
-  fields optione  = inverseOf(red | green);
-  fields options;
-
+  fields options  = inverseOf(red | green);
+  fields strategicMoves;
+  
   Serial.println("misereComputerTurn!");
   Serial.print("red: ");
   Serial.println(red, BIN);
   Serial.print("green: ");
   Serial.println(green, BIN);
- 
-//  //Avoid completing a row
-//  if (options = completingDrops(player, opponent)) {
-//
-//    Serial.print("win: ");
-//    Serial.println(options, BIN);
-//
-//    return oneOf(options);
-//  }
-//
-//  //Prevent the opponent from completing a row
-//  if (options = completingDrops(opponent, player)) {
-//
-//    Serial.print("defend: ");
-//    Serial.println(options, BIN);
-//
-//    return oneOf(options);
-//  }
-//
-//  //Occupy the center if possible
-//  if (0b000010000 & free) {
-//
-//    Serial.println("center");
-//
-//    return 0b000010000;
-//  }
-//
-//  //Occupy a corner if possible
-//  if (options = (0b101000101 & free)) {
-//
-//    Serial.println("corner");
-//
-//    return oneOf(options);
-//  }
+  
+  //Avoid completing a row
+  strategicMoves = completingDrops(player, opponent);
+  if (options & ~strategicMoves) {
+    options &= ~strategicMoves;
+  }
+    
+  //Don't block the opponent from completing a row
+  strategicMoves = completingDrops(opponent, player);
+  if (options & ~strategicMoves) {
+    options &= ~strategicMoves;
+  }
+  
+  //Avoid the center
+  if (options & 0b111101111) {
+    options &= 0b111101111;
+  }
 
-   //Pick a random field
+  //Avoid the cornere
+  if (options & 0b010111010) {
+    options &= 0b010111010;
+  }
 
-    Serial.println("random");
-
-    return oneOf(options);
+  //Pick one of the remaining options
+  Serial.println("random");
+  return oneOf(options);
 }
-
-  // ...
 
 
 

@@ -54,26 +54,42 @@ fields inverseOf(fields set) {
   return (~set & 0b111111111);
 }
 
-////Find all horizintal and vertical neighbors of a given set of fields
-//// args:   set: set of fields to find neighbors for
-//// result: neighbors of input set
-//fields neighborsOf(fields set) {
-//  fields result = 0;
-//
-//  //Left neighbors
-//  result |= (set >> 1) & 0x011011011;
-//  //Rightt neighbors
-//  result |= (set << 1) & 0x110110110;
-//  //Upper neighbors
-//  result |= (set >> 3);
-//  //Lower neighbors
-//  result |= (set << 3);
-//  //Exclude input fields
-//  result &= ~set;
-//  
-//  return result;
-//}
+//Find all horizintal and vertical neighbors of a given set of fields
+// args:   set: set of fields to find neighbors for
+// result: neighbors of input set
+fields neighborsOf(fields set) {
+  fields result = 0;
 
+  //Left neighbors
+  result |= (set & 0b011011011) << 1;
+  //Right neighbors
+  result |= (set & 0b110110110) >> 1;
+  //Upper neighbors
+  result |= (set >> 3);
+  //Lower neighbors
+  result |= (set << 3) & 0b111111111;
+  //Exclude input fields
+  result &= ~set;
+
+  //Serial.println("neighborsOf!");
+  //Serial.print("set: ");
+  //Serial.println(set, BIN);
+  //Serial.print("return: ");
+  //Serial.println(result, BIN);
+
+  return result;
+}
+
+//Shift a piece in a set
+// args: set:          players set of fields
+//       fromPosition: field to move away from
+//       toPosition:   field to move to
+// result: neighbors of input set
+fields shift(fields set, fields fromPosition, fields toPosition) {
+
+  return (set & inverseOf(fromPosition)) | toPosition;
+}
+  
 //Count the fields in a given set
 // args:   set: set of fields
 // result: number of fields in the the set
@@ -153,9 +169,9 @@ fields oneOf(fields set) {
 fields completeRows(fields set) {
   fields result = 0;
 
-  Serial.println("completeRows!");
-  Serial.print("set: ");
-  Serial.println(set, BIN);
+  //Serial.println("completeRows!");
+  //Serial.print("set: ");
+  //Serial.println(set, BIN);
   
   //Check 8 patterns
   // ---
@@ -211,8 +227,8 @@ fields completeRows(fields set) {
   // /..
   result |= isSubset(set, 0b001010100) ? 0b001010100 : 0b000000000;
 
-  Serial.print("return: ");
-  Serial.println(result, BIN);
+  //Serial.print("return: ");
+  //Serial.println(result, BIN);
 
   return result;
 }
