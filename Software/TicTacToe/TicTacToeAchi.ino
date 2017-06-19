@@ -194,6 +194,7 @@ fields achiComputerTurn(turn currentTurn) {
   fields free     = inverseOf(red | green);
   fields options  = neighborsOf(free) & player;
   fields iterator;   //field iterator
+  fields shifted;    //resust of potential shift
   
   //Serial.println("achiComputerTurn!");
   //Serial.print("red: ");
@@ -201,12 +202,19 @@ fields achiComputerTurn(turn currentTurn) {
   //Serial.print("green: ");
   //Serial.println(green, BIN);
 
-  //Try to complete a row
+  //Try to win
   for (iterator = 0b000000001;
        iterator < 0b111111111;
        iterator <<= 1) {
-    if (options & iterator) {      
-      if (completeRows(shift(player, iterator, free))) {
+    if (options & iterator) {
+      //Shift palayer's field at the iterator
+      shifted = shift(player, iterator, free);
+      //Three in a row
+      if (completeRows(shifted)) {
+	return iterator;
+      }
+      //Opponent can't move
+      if (!((neighborsOf(inverseOf(opponent | shifted))) & (opponent))) {
 	return iterator;
       }
     }
