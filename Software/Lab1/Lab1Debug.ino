@@ -1,5 +1,5 @@
 //###############################################################################
-//# TicTacToe - Hardware Test                                                   #
+//# TicTacToe - Lab1 -> Debug Routines                                          #
 //###############################################################################
 //#    Copyright 2017 Dirk Heisswolf                                            #
 //#    This file is part of the TicTacToe project.                              #
@@ -23,7 +23,7 @@
 //#                                                                             #
 //###############################################################################
 //# Version History:                                                            #
-//#    June 8, 2017                                                             #
+//#    June 28, 2017                                                             #
 //#      - Initial release                                                      #
 //###############################################################################
 
@@ -34,7 +34,10 @@
 
 // Input functions
 //=================
-void debugModifyInput() {
+//Wait for key input and toggle the display  
+// args:   none
+// result: none
+void debugInput() {
   fields input;
   
   input = getKey();                                //get keypad input
@@ -53,94 +56,87 @@ void debugModifyInput() {
 
 // Output functions
 //==================
-//Print vertival line
-void debugVl() {
-  Serial.print("|");
-} 
+//Print the result of a board operation. e.g:
+// Input:     Output:
+// R| |G       |*| 
+// -+-+-      -+-+-
+// G|R|   =>   | |*
+// -+-+-      -+-+-
+// G| |R       |*|
+//
+// args:   output: set of fields to print 
+// result: none
+void debugOutput(fields output) {
+  //Print header
+  Serial.print("Input:     Output");
+  //Check output range
+  if (output > 0b111111111) {
+    Serial.print(" (invalid)");
+  }
+  Serial.println(":");
+  //Print top row
+  debugPrintInputRow(0b000000001)
+  Serial.println("      ");
+  debugPrintOutputRow(0b000000001, output)
+  Serial.println();
+  //Print row seperator
+  Serial.println("-+-+-      -+-+-");
+  //Print middle row
+  debugPrintInputRow(0b000001000)
+  Serial.println("  =>  ");
+  debugPrintOutputRow(0b000001000, output)
+  Serial.println();
+  //Print row seperator
+  Serial.println("-+-+-      -+-+-");
+  //Print bottom row
+  debugPrintInputRow(0b001000000)
+  Serial.println("  =>  ");
+  debugPrintOutputRow(0b001000000, output)
+  Serial.println();
+  Serial.println();
+}
 
-//Print horizontal line
-void debugHl() {
-  Serial.print("-+-+-");
-} 
-
-//Print seperator
-void debugSep() {
-  Serial.print("    ");
-} 
-
-//Print arrow
-void debugArrow() {
-  Serial.print(" => ");
-} 
-
-//Print input fields
-void debugRb(fields sel) {
-  if        (!(red & sel) && !(green & sel)) {
-    Serial.print(" ");
-  } else if ( (red & sel) && !(green & sel)) {
-    Serial.print("R");
-  } else if (!(red & sel) &&  (green & sel)) {
-    Serial.print("G");
-  } else {
-    Serial.print("?");
+//Print input row
+// args:   position (leftmost field in the row) 
+// result: none
+void debugPrintInputRow(fields position) {
+  for (int i = 0, i < 3, i++) {
+    //Print column separator
+    if (i) {
+      Serial.print("|");
+    }
+    //Print field
+    if (position & red & ~green) {
+      Serial.print("R"); //red
+    } else if (position & ~red & green) {
+      Serial.print("G"); //green
+    } else if (position & red & green) {
+      Serial.print("B"); //both
+    } else {
+      Serial.print(" "); //empty
+    }
+    //Advance position
+    position <<= 1;
   }
 }
 
-//Print output fields
-void debugRes(fields sel) {
-  if (result & sel) {
-    Serial.print("*");
-  } else {
-    Serial.print(" ");
+//Print output row
+// args:   position (leftmost field in the row) 
+//         output
+// result: none
+void debugPrintInputRow(fields position, fields output) {
+  for (int i = 0, i < 3, i++) {
+    //Print column separator
+    if (i) {
+      Serial.print("|");
+    }
+    //Print field
+    if (position & output) {
+      Serial.print("*"); //set
+    } else {
+      Serial.print(" "); //clear
+    }
+    //Advance position
+    position <<= 1;
   }
-}
-
-//Print result
-void debugPrintResult() {
-  //Debug output
-  debugRb(0b000000001);  //first row
-  debugVl();		 //
-  debugRb(0b000000010);	 //
-  debugVl();		 //
-  debugRb(0b000000100);	 //
-  debugSep();		 //
-  debugRes(0b000000001); //
-  debugVl();		 //
-  debugRes(0b000000010); //
-  debugVl();		 //
-  debugRes(0b000000100); //
-  Serial.println();      //
-  debugHl;		 //horizontal lines
-  debugSep();		 //
-  debugHl();		 //
-  Serial.println();	 //
-  debugRb(0b000001000);	 //second row
-  debugVl();		 //
-  debugRb(0b000010000);	 //
-  debugVl();		 //
-  debugRb(0b000100000);	 //
-  debugArrow();		 //
-  debugRes(0b000001000); //
-  debugVl();		 //
-  debugRes(0b000010000); //
-  debugVl();		 //
-  debugRes(0b000100000); //
-  Serial.println();	 //
-  debugHl;		 //horizontal lines
-  debugSep();		 //
-  debugHl();		 //
-  Serial.println();	 //
-  debugRb(0b001000000);	 //third row
-  debugVl();		 //
-  debugRb(0b010000000);	 //
-  debugVl();		 //
-  debugRb(0b100000000);	 //
-  debugSep();		 //
-  debugRes(0b001000000); //
-  debugVl();		 //
-  debugRes(0b010000000); //
-  debugVl();		 //
-  debugRes(0b100000000); //
-  Serial.println();      //
-  Serial.println();      //
 }

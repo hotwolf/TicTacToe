@@ -46,7 +46,7 @@
 
 // Variables
 //===========
-fields input;
+fields gameSelection;
   
 // Setup routine
 //===============
@@ -64,11 +64,17 @@ void setup() {
   //Keypad
   keysSetup();
 
-  //Intro
+  //Intro text
+  //Control characters: \x80 = loop
+  //                    \x81 = display red text
+  //                    \x82 = display green text
+  //                    \x83 = display bicolor (red+green) text
+  //                    \x84 = start of the loop
+  //  
   //        green    red    green     loop
   //          V       V       V        V 
-  textShow("\x82TIC \x81TAC \x82TOE  \x80");
-  input = getKey();
+  textShow("\x82TIC \x81TAC \x82TOE \x80");
+  gameSelection = getKey();
   textStop();
 
 }
@@ -85,11 +91,11 @@ void loop() {
   blinkGreen = 0;
   
   //Determine players
-  if (input & 0b001001001) {
+  if (gameSelection & 0b001001001) {
     //Me 1st
     greenIsHuman = true;
     redIsHuman   = false;
-  } else if (input & 0b010010010) {
+  } else if (gameSelection & 0b010010010) {
     //Arduino 1st
     greenIsHuman = false;
     redIsHuman   = true;
@@ -100,10 +106,10 @@ void loop() {
   }
   
   //Start Game
-  if (input & 0b000000111) {
+  if (gameSelection & 0b000000111) {
     //Classic
     classicPlay();
-  } else if (input & 0b000111000) {
+  } else if (gameSelection & 0b000111000) {
     //Misere
     miserePlay();
   } else {
@@ -112,6 +118,6 @@ void loop() {
   }
 
   //Next game
-  input = getKey();
+  gameSelection = getKey();
 }
 

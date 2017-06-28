@@ -1,7 +1,5 @@
-#ifndef TicTacToe_h
-#define TicTacToe_h
 //###############################################################################
-//# TicTacToe                                                                   #
+//# TicTacToe - Lab1                                                            #
 //###############################################################################
 //#    Copyright 2017 Dirk Heisswolf                                            #
 //#    This file is part of the TicTacToe project.                              #
@@ -19,55 +17,40 @@
 //#    You should have received a copy of the GNU General Public License        #
 //#    along with TicTacToe.  If not, see <http://www.gnu.org/licenses/>.       #
 //###############################################################################
+//# This sketch is a basic hardware test for the TicTacToe shield. Coming out   #
+//# of reset, all red LEDs are lit. The green ones are cleared. Presseng a      #
+//# button will toggle the associated the associated LEDs.                      #
+//#                                                                             #
+//###############################################################################
 //# Version History:                                                            #
-//#    March 30, 2017                                                           #
+//#    June 28, 2017                                                            #
 //#      - Initial release                                                      #
 //###############################################################################
 
-// Target Check
-//==============
-#if defined(ARDUINO_AVR_UNO)
-#else
-#error Unsupported hardware
-#endif
+#include "TicTacToe.h"
 
-// Constants
-//===========
+// Setup routine
+//===============
+void setup() {
+  Serial.begin(9600);       //setup UART
+  Serial.println("Lab1:");  //start message
+  dispSetup();              //setup display
+  keysSetup();              //setup keypad
+}
 
-// Type definitions
-//==================
-// A|B|C     15     8 7      0
-// -+-+-    +--------+--------+ 
-// D|E|F => |-------I|HGFEDCBA| 
-// -+-+-    +--------+--------+ 
-// G|H|I
-typedef unsigned int fields;  
+// Debug Code
+//============
+void loop() {
+  fields output = 0;
 
-// Variables                                
-//===========                                
-//Display control
-fields  red;             //red fields on the board 
-fields  green;           //green fields on the board
-fields  scanRed;         //red fields, highligted as selectable 
-fields  scanGreen;       //green fields, highligted as selectable
-fields  blinkRed;        //red fields, highligted as winning move
-fields  blinkGreen;      //green fields, highligted as winning move
-//Custom animation routine
-void (*dispAnimator)(fields *red, fields *green) = NULL;//function pointer
+  //Get debug input toggle fields
+  debugInput();
 
-// Inline assembler
-//==================
-//Wait for any interrupt
-#define WAIT_FOR_INTERRUPT()                     \
-do {                                             \
-  __asm__ __volatile__ ( "sei" "\n\t" :: );      \
-  __asm__ __volatile__ ( "sleep" "\n\t" :: );    \
-} while(0)
+  //Test function
+  output = completeRows(green);
+  //output = completingDrops(red, green);
 
-#define NOP()                                    \
-do {                                             \
-  __asm__ __volatile__ ( "nop" "\n\t" :: );      \
-  __asm__ __volatile__ ( "nop" "\n\t" :: );      \
-} while(0)
+  //Print result (blinkRed)
+  debugOutput(output);
+}
 
-#endif

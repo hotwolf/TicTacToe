@@ -42,22 +42,22 @@ void classicPlay () {
 
     //Green move
     //==========
-    green |= classicTurn(greenTurn);         //place green piece
-    if (blinkGreen = completeRows(green)) {  //check if green has won
+    green |= classicTurn(greenTurn);          //place green piece
+    if (blinkGreen = completedRowsIn(green)) {//check if green has won
       break;
-    } else if ((red|green) == 0b111111111) { //check for tie
-      blinkRed   = 0b111111111;              //flash all LEDs
+    } else if ((red|green) == 0b111111111) {  //check for tie
+      blinkRed   = 0b111111111;               //flash all LEDs
       blinkGreen = 0b111111111;
       break; 
     }
   
     //Red move
     //========
-    red |= classicTurn(redTurn);             //place red piece
-    if (blinkRed = completeRows(red)) {      //check if green has won
+    red |= classicTurn(redTurn);              //place red piece
+    if (blinkRed = completedRowsIn(red)) {    //check if green has won
       break;
-    } else if ((red|green) == 0b111111111) { //check for tie
-      blinkRed   = 0b111111111;              //flash all LEDs
+    } else if ((red|green) == 0b111111111) {  //check for tie
+      blinkRed   = 0b111111111;               //flash all LEDs
       blinkGreen = 0b111111111;
       break;
     }

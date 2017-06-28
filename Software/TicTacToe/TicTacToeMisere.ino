@@ -35,7 +35,7 @@
 //======
 //Play Misere
 // args:   greenIsHuman: true if green player is human
-//         redIsHuman:   true if red player is human  
+//         redIsHuman:   true if red player is human
 // result: none
 void miserePlay() {
   //Game loop
@@ -43,19 +43,19 @@ void miserePlay() {
 
     //Green move
     //==========
-    green |= misereTurn(greenTurn);      //place green piece
-    if (blinkRed = completeRows(green)) {//check if green has won
+    green |= misereTurn(greenTurn);          //place green piece
+    if (blinkRed = completedRowsIn(green)) { //check if green has won
       break;
     } else if ((red|green) == 0b111111111) { //check for tie
       blinkRed   = 0b111111111;              //flash all LEDs
       blinkGreen = 0b111111111;
       break;
     }
-  
+
     //Red move
     //========
-    red |= misereTurn(redTurn);                  //place red piece
-    if (blinkGreen = completeRows(red)) {    //check if green has won
+    red |= misereTurn(redTurn);              //place red piece
+    if (blinkGreen = completedRowsIn(red)) { //check if green has won
       break;
     } else if ((red|green) == 0b111111111) { //check for tie
       blinkRed   = 0b111111111;              //flash all LEDs
@@ -69,7 +69,7 @@ void miserePlay() {
 //One turn of the Misere game
 // args:   color
 // result: new mark to be placed
-fields misereTurn(turn currentTurn) { 
+fields misereTurn(turn currentTurn) {
   if ((currentTurn == greenTurn) ? greenIsHuman : redIsHuman) {
     return classicHumanTurn(currentTurn);
   } else {
@@ -84,25 +84,25 @@ fields misereComputerTurn(turn currentTurn) {
   fields opponent = (currentTurn == greenTurn) ? red   : green;
   fields options  = inverseOf(red | green);
   fields strategicMoves;
-  
+
   Serial.println("misereComputerTurn!");
   Serial.print("red: ");
   Serial.println(red, BIN);
   Serial.print("green: ");
   Serial.println(green, BIN);
-  
+
   //Avoid completing a row
   strategicMoves = completingDrops(player, opponent);
   if (options & ~strategicMoves) {
     options &= ~strategicMoves;
   }
-    
+
   //Don't block the opponent from completing a row
   strategicMoves = completingDrops(opponent, player);
   if (options & ~strategicMoves) {
     options &= ~strategicMoves;
   }
-  
+
   //Avoid the center
   if (options & 0b111101111) {
     options &= 0b111101111;
@@ -117,10 +117,4 @@ fields misereComputerTurn(turn currentTurn) {
   Serial.println("random");
   return oneOf(options);
 }
-
-
-
-
-
-
 

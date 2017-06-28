@@ -36,7 +36,7 @@
 //======
 //Play the classic game
 // args:   greenIsHuman: true if green player is human
-//         redIsHuman:   true if red player is human  
+//         redIsHuman:   true if red player is human
 // result: none
 void achiPlay() {
   //Variables
@@ -44,81 +44,81 @@ void achiPlay() {
 
   Serial.println("Achi!");
 
-  
+
   //8 turns of drop game
   for (int i = 0; i < 4; i++) {
 
     //Green move
     //==========
-    green |= classicTurn(greenTurn);         //place green piece
-    if (blinkGreen = completeRows(green)) {  //check if green has won
+    green |= classicTurn(greenTurn);           //place green piece
+    if (blinkGreen = completedRowsIn(green)) { //check if green has won
       gameOver = true;
       break;
-    } else if ((red|green) == 0b111111111) { //check for tie
-      blinkRed   = 0b111111111;              //flash all LEDs
+    } else if ((red|green) == 0b111111111) {   //check for tie
+      blinkRed   = 0b111111111;                //flash all LEDs
       blinkGreen = 0b111111111;
       gameOver = true;
-      break; 
+      break;
     }
-  
+
     //Red move
     //========
-    red |= classicTurn(redTurn);             //place red piece
-    if (blinkRed = completeRows(red)) {      //check if green has won
+    red |= classicTurn(redTurn);               //place red piece
+    if (blinkRed = completedRowsIn(red)) {     //check if green has won
       gameOver = true;
       break;
-    } else if ((red|green) == 0b111111111) { //check for tie
-      blinkRed   = 0b111111111;              //flash all LEDs
+    } else if ((red|green) == 0b111111111) {   //check for tie
+      blinkRed   = 0b111111111;                //flash all LEDs
       blinkGreen = 0b111111111;
       gameOver = true;
       break;
     }
   }
-  //Start shift game in case of a tie
+  //Start move game in case of a tie
   if (!gameOver) {
-    
-    //Shift game
+
+    //Move game
     while (1) {
       fields achiMove;
-      
+
       //Green move
       //==========
-      if (achiMove = achiTurn(greenTurn)){   //shift green piece
-	
-	green = shift(green, achiMove, inverseOf(red | green));//update fields
-	
-	if (blinkGreen = completeRows(green)) {  //check if green has won
-	  break;
-	}
+      if (achiMove = achiTurn(greenTurn)){     //move green piece
+
+        green = move(green, achiMove, inverseOf(red | green));//update fields
+
+        if (blinkGreen = completedRowsIn(green)) {//check if green has won
+          break;
+        }
 
       } else {
-	blinkRed = red;                      //green can't move => red won
-	break;
+        blinkRed = red;                        //green can't move => red won
+        break;
       }
-      
+
       //Red move
       //========
-      if (achiMove = achiTurn(redTurn)){     //shift green piece
-	
-	red = shift(red, achiMove, inverseOf(red | green));//update fields
-	
-	if (blinkRed = completeRows(red)) {  //check if green has won
-	  break;
-	}
+      if (achiMove = achiTurn(redTurn)){       //move green piece
+
+        red = move(red, achiMove, inverseOf(red | green));//update fields
+
+        if (blinkRed = completedRowsIn(red)) { //check if green has won
+          break;
+        }
 
       } else {
-	blinkGreen = green;                  //red can't move => green won
-	break;
+        blinkGreen = green;                    //red can't move => green won
+        break;
       }
 
     }
   }
 }
-     
-//One turn of the shift game
+
+//One turn of the move game
 // args:   color
 // result: new mark to be placed
-fields achiTurn(turn currentTurn) { 
+fields achiTurn(turn currentTurn) {
   fields player   = (currentTurn == greenTurn) ? green : red;
   fields opponent = (currentTurn == greenTurn) ? red   : green;
   fields free     = inverseOf(red | green);
@@ -133,22 +133,23 @@ fields achiTurn(turn currentTurn) {
     } else {
       return achiComputerTurn(currentTurn);
     }
-    
+
   } else {
 
     return 0; //no move left
-    
+
   }
 }
 
-//Human turn in the shift game
+//Human turn in the move game
 // args:   color
 fields achiHumanTurn(turn currentTurn) {
+  fields input    = 0;
   fields player   = (currentTurn == greenTurn) ? green : red;
   fields opponent = (currentTurn == greenTurn) ? red   : green;
   fields free     = inverseOf(red | green);
   fields options  = neighborsOf(free) & player;
-  
+
   //Highlight options
   if (currentTurn == greenTurn) {
     scanGreen  = options;
@@ -157,11 +158,11 @@ fields achiHumanTurn(turn currentTurn) {
     scanRed  = options;
     blinkRed = options;
   }
- 
+
   //Get valid input
   do {
-    input = getKey();
-    
+    gameSelection = getKey();
+
   } while (!(input & options));
 
   //Clear highlights
@@ -169,40 +170,41 @@ fields achiHumanTurn(turn currentTurn) {
   scanRed    = 0;
   blinkGreen = 0;
   blinkRed   = 0;
-  
+
   return input;
 
 }
 
-//Computer turn in the shift game
+//Computer turn in the move game
 // args:   color
-fields achiComputerTurn(turn currentTurn) { 
+fields achiComputerTurn(turn currentTurn) {
   fields player   = (currentTurn == greenTurn) ? green : red;
   fields opponent = (currentTurn == greenTurn) ? red   : green;
   fields free     = inverseOf(red | green);
   fields options  = neighborsOf(free) & player;
   fields iterator;   //field iterator
-  fields shifted;    //resust of potential shift
-  
+  fields moved;    //resust of potential move
+
   //Try to win
   for (iterator = 0b000000001;
        iterator < 0b111111111;
        iterator <<= 1) {
     if (options & iterator) {
-      //Shift palayer's field at the iterator
-      shifted = shift(player, iterator, free);
+      //Move palayer's field at the iterator
+      moved = move(player, iterator, free);
       //Three in a row
-      if (completeRows(shifted)) {
-	return iterator;
+      if (completedRowsIn(moved)) {
+        return iterator;
       }
       //Opponent can't move
-      if (!((neighborsOf(inverseOf(opponent | shifted))) & (opponent))) {
-	return iterator;
+      if (!((neighborsOf(inverseOf(opponent | moved))) & (opponent))) {
+        return iterator;
       }
     }
   }
 
   //Pick a random field
    return oneOf(options);
-  
+
 }
+

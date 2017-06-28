@@ -32,7 +32,7 @@
 //========
 //Check if a set of fields is a subset of another set of fields
 // args:   superset: set of fields
-//         subset:   set of fields  
+//         subset:   set of fields
 // result: true if "subset" is a subset of "superset"
 boolean isSubset(fields superset, fields subset) {
   return ((superset & subset) == subset);
@@ -67,28 +67,28 @@ fields neighborsOf(fields set) {
   return result;
 }
 
-//Shift a piece in a set
+//Move a piece in a set
 // args: set:          players set of fields
 //       fromPosition: field to move away from
 //       toPosition:   field to move to
 // result: neighbors of input set
-fields shift(fields set, fields fromPosition, fields toPosition) {
+fields move(fields set, fields fromPosition, fields toPosition) {
 
   return (set & inverseOf(fromPosition)) | toPosition;
 }
-  
+
 //Count the fields in a given set
 // args:   set: set of fields
 // result: number of fields in the the set
 unsigned char countOf(fields set) {
   unsigned char result = 0; //return value
   fields        iterator;   //field iterator
-  
+
   //Iterate through all fields
   for (iterator = 0b000000001;
        iterator < 0b111111111;
        iterator <<= 1) {
-    if (set & iterator) {      
+    if (set & iterator) {
       result++;
     }
   }
@@ -112,20 +112,20 @@ fields oneOf(fields set) {
 
     return set;
   }
-  
-  //Pick a numer that is smaller then the field count  
+
+  //Pick a numer that is smaller then the field count
   pick = random(count);
 
   //Iterate through all fields
   for (iterator = 0b000000001;
        iterator < 0b111111111;
        iterator <<= 1) {
-    if (set & iterator) {      
+    if (set & iterator) {
       if (!pick--) {
 
-	return iterator;
+        return iterator;
       }
-    }   
+    }
   }
 }
 
@@ -134,9 +134,9 @@ fields oneOf(fields set) {
 //Find all completed rows in a given set of fields
 // args:   set: set of fields
 // result: all fields that are part of a completed row
-fields completeRows(fields set) {
+fields completedRowsIn(fields set) {
   fields result = 0;
-  
+
   //Check 8 patterns
   // ---
   // ...
@@ -182,12 +182,12 @@ fields completingDrops(fields player, fields opponent) {
   fields result = 0;   //return value
   fields iterator;     //field iterator
 
-    //Iterate through all fields
+  //Iterate through all fields
   for (iterator = 0b000000001;
        iterator < 0b111111111;
        iterator <<= 1) {
-    if (!isSubset((player|opponent), iterator)) {       
-      if (completeRows(player|iterator)) {
+    if (!isSubset((player|opponent), iterator)) {
+      if (completedRowsIn(player|iterator)) {
         result |= iterator;
       }
     }

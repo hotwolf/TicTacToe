@@ -1,5 +1,5 @@
 //###############################################################################
-//# TicTacToe - Lab Exercises                                                   #
+//# TicTacToe - Lab1 -> Exercise                                                #
 //###############################################################################
 //#    Copyright 2017 Dirk Heisswolf                                            #
 //#    This file is part of the TicTacToe project.                              #
@@ -23,35 +23,115 @@
 //#                                                                             #
 //###############################################################################
 //# Version History:                                                            #
-//#    June 8, 2017                                                             #
+//#    June 28, 2017                                                            #
 //#      - Initial release                                                      #
 //###############################################################################
 
 #include "TicTacToe.h"
 
-// Variables
-//===========
-fields result = 0;
+// inverseOf()
+//=============
+//Invert a set of fields
+// args:   set: set of fields
+// result: inverted set of fields
+fields inverseOf(fields set) {
 
-// Setup routine
-//===============
-void setup() {
-  Serial.begin(9600);                     //setup UART
-  Serial.println("Ready for debugging!"); //start message
-  dispSetup();                            //setup display
-  keysSetup();                            //setup keypad
-  result = 0;                             //reset result
-}
-
-// Application loop
-//==================
-void loop() {
-
-  debugModifyInput();                     //select input pattern
-
-
-
-
-  debugPrintResult();                      //print results   
+  return (~set & 0b111111111);
 
 }
+
+// isSubset()
+//============
+//Check if a set of fields is a subset of another set of fields
+// args:   superset: set of fields
+//         subset:   set of fields
+// result: true if "subset" is a subset of "superset"
+boolean isSubset(fields superset, fields subset) {
+
+  return ((superset & subset) == subset);
+
+}
+
+// completedRowsIn()
+//===================
+//Find all completed rows in a given set of fields
+// args:   set: set of fields
+// result: all fields that are part of a completed row
+//
+//Examples:
+//
+//  |*|          | |
+// -+-+-        -+-+-
+// *| |*   =>    | |
+// -+-+-        -+-+-
+// *| |          | |
+//
+//  |*|          | |
+// -+-+-        -+-+-
+// *|*|*   =>   *|*|*
+// -+-+-        -+-+-
+// *| |          | |
+//
+//  |*|*         | |*
+// -+-+-        -+-+-
+// *|*|*   =>   *|*|*
+// -+-+-        -+-+-
+// *| |         *| |
+//
+fields completedRowsIn(fields set) {
+
+
+
+
+  //...your code...
+
+
+
+
+}
+
+// completingDrops()
+//===================
+//Find all vacant field that will complete a row for the player
+// args:   player:   current player's set of fields
+//         opponent: opponent's set of fields
+// result: all fields that would complete a row for the current player
+//
+//Examples:
+//
+//  |O|         *| |
+// -+-+-        -+-+-
+// P| |O   =>    | |
+// -+-+-        -+-+-
+// P| |          | |
+//
+//  |O|         *| |*
+// -+-+-        -+-+-
+// P|P|O   =>    | |
+// -+-+-        -+-+-
+// P| |          | |
+//
+// O| |O         | |
+// -+-+-        -+-+-
+// P|P|O   =>    | |
+// -+-+-        -+-+-
+// P| |          | |
+//
+fields completingDrops(fields player, fields opponent) {
+
+
+
+
+  //...your code...
+
+
+
+  
+}
+
+  //Tip:
+  //To loop through all fields try this:
+  //
+  //for (fields iterator = 0b000000001; iterator < 0b111111111; iterator <<= 1) {
+  //  ...
+  //}
