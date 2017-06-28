@@ -1,5 +1,5 @@
 //###############################################################################
-//# TicTacToe - Lab2 -> Exercise                                                #
+//# TicTacToe - Lab3                                                            #
 //###############################################################################
 //#    Copyright 2017 Dirk Heisswolf                                            #
 //#    This file is part of the TicTacToe project.                              #
@@ -29,82 +29,27 @@
 
 #include "TicTacToe.h"
 
-// classicComputerTurn()
-//=======================
-//Computer turn in the classic game
-// args:   color
-fields classicComputerTurn(turn currentTurn) {
-  fields player   = (currentTurn == greenTurn) ? green : red;
-  fields opponent = (currentTurn == greenTurn) ? red   : green;
-  fields free     = inverseOf(red | green);
-  fields options;
-
-  //Try to win the game. Complete a row if possible
-
-
-     //...your code...
-
-
-  //Prevent the opponent from winning. Block a row of the opponent if possible
-
-
-     //...your code...
-
-
-  //Occupy the center if possible
-
-
-     //...your code...
-
-
-  //Occupy a corner if possible
-
-
-     //...your code...
-
-
-  //Pick a random field
-
-
-     //...your code...
-
+// Setup routine
+//===============
+void setup() {
+  Serial.begin(9600);       //setup UART
+  Serial.println("Lab3:");  //start message
+  dispSetup();              //setup display
+  keysSetup();              //setup keypad
 }
 
-  //Tip:
-  //To pick one field from a set, use the function oneOf(...);
-  //
+// Debug Code
+//============
+void loop() {
 
+    //Human against computer, human begins
+    greenIsHuman = true;
+    redIsHuman   = false;
 
-// oneOf()
-//=========
-//Select one random field out of a given set
-// args:   set: set of selectable fields
-// result: randomly selected field
-fields oneOf(fields set) {
-  unsigned char count;     //number of fields
-  unsigned char pick;      //random pick
-  fields        iterator;  //field iterator
+    //Classic
+    classicPlay();
 
-  //Count the number of fields
-  count = countOf(set);
+    //Wait for key
+    getKey();
 
-  //No choice
-  if (count < 2) {
-    return set;
-  }
-
-  //Pick a numer that is smaller then the field count
-  pick = random(count);
-
-  //Iterate through all fields
-  for (iterator = 0b000000001;
-       iterator < 0b111111111;
-       iterator <<= 1) {
-    if (set & iterator) {
-      if (!pick--) {
-        return iterator;
-      }
-    }
-  }
 }
-

@@ -107,9 +107,8 @@ fields oneOf(fields set) {
   //Count the number of fields
   count = countOf(set);
 
-  //no choice
+  //No choice
   if (count < 2) {
-
     return set;
   }
 
@@ -122,7 +121,6 @@ fields oneOf(fields set) {
        iterator <<= 1) {
     if (set & iterator) {
       if (!pick--) {
-
         return iterator;
       }
     }

@@ -1,5 +1,5 @@
 //###############################################################################
-//# TicTacToe - Lab2 -> Exercise                                                #
+//# TicTacToe - Lab3 -> Exercise                                                #
 //###############################################################################
 //#    Copyright 2017 Dirk Heisswolf                                            #
 //#    This file is part of the TicTacToe project.                              #
@@ -29,82 +29,85 @@
 
 #include "TicTacToe.h"
 
-// classicComputerTurn()
-//=======================
-//Computer turn in the classic game
-// args:   color
-fields classicComputerTurn(turn currentTurn) {
-  fields player   = (currentTurn == greenTurn) ? green : red;
-  fields opponent = (currentTurn == greenTurn) ? red   : green;
-  fields free     = inverseOf(red | green);
-  fields options;
+// classicPlay()
+//===============
+//Play the classic game
+// args:   none 
+// result: none
+void classicPlay () {
+  //Game loop
+  while (1) {
 
-  //Try to win the game. Complete a row if possible
+    //Green move
+    //==========
+    green |= classicTurn(greenTurn);          //place green piece
 
+    //Check if green won, otherwise check for a tie
 
-     //...your code...
+    
+    //...your code...
 
+  
+    //Red move
+    //========
+    red |= classicTurn(redTurn);              //place red piece
 
-  //Prevent the opponent from winning. Block a row of the opponent if possible
+    //Check if red won, otherwise check for a tie
 
+    
+    //...your code...
 
-     //...your code...
-
-
-  //Occupy the center if possible
-
-
-     //...your code...
-
-
-  //Occupy a corner if possible
-
-
-     //...your code...
-
-
-  //Pick a random field
-
-
-     //...your code...
-
+  }
 }
 
-  //Tip:
-  //To pick one field from a set, use the function oneOf(...);
+  //Tips:
+  //Use "break;" to exit the while(1) loop
+  //
+  //To make a pattern blink on the display, do:
+  //
+  // blinkGreen = 0b.........;
+  //   ...or...
+  // blinkRed   = 0b.........;
   //
 
 
-// oneOf()
-//=========
-//Select one random field out of a given set
-// args:   set: set of selectable fields
-// result: randomly selected field
-fields oneOf(fields set) {
-  unsigned char count;     //number of fields
-  unsigned char pick;      //random pick
-  fields        iterator;  //field iterator
-
-  //Count the number of fields
-  count = countOf(set);
-
-  //No choice
-  if (count < 2) {
-    return set;
-  }
-
-  //Pick a numer that is smaller then the field count
-  pick = random(count);
-
-  //Iterate through all fields
-  for (iterator = 0b000000001;
-       iterator < 0b111111111;
-       iterator <<= 1) {
-    if (set & iterator) {
-      if (!pick--) {
-        return iterator;
-      }
-    }
+// classicTurn()
+//===============
+//One turn of the classic game
+// args:   color
+// result: new mark to be placed
+fields classicTurn(turn currentTurn) { 
+  if ((currentTurn == greenTurn) ? greenIsHuman : redIsHuman) {
+    return classicHumanTurn(currentTurn);
+  } else {
+    return classicComputerTurn(currentTurn);
   }
 }
 
+// classicHumanTurn()
+//====================
+//Human turn in the classic game
+// args:   color
+fields classicHumanTurn(turn currentTurn) {
+  fields free   = inverseOf(red | green);
+  fields input;
+
+  //Highlight free fields
+  if (currentTurn == greenTurn) {
+    scanGreen = free;
+  } else {
+    scanRed   = free;
+  } 
+
+  //Get valid input
+  do {
+    input = getKey();
+
+  } while (!(input & free));
+
+  //Clear highlights
+  scanGreen = 0;
+  scanRed   = 0;
+
+  return input;
+}
