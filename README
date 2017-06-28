@@ -8,6 +8,8 @@ Directories:
 +-Hardware              - Everything needed to build the TicTacToe shield
 |
 +-Software              - Source files of the TicTacToe shields firmware
+|
++-Workshop              - Workshop materials
 
 The TicTacToe software is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
