@@ -108,3 +108,23 @@ fields oneOf(fields set) {
   }
 }
 
+// countOf()
+//===========
+//Count the fields in a given set
+// args:   set: set of fields
+// result: number of fields in the the set
+unsigned char countOf(fields set) {
+  unsigned char result = 0; //return value
+  fields        iterator;   //field iterator
+
+  //Iterate through all fields
+  for (iterator = 0b000000001;
+       iterator < 0b111111111;
+       iterator <<= 1) {
+    if (set & iterator) {
+      result++;
+    }
+  }
+
+  return result;
+}
