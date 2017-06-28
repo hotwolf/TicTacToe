@@ -149,38 +149,26 @@ fields achiHumanTurn(turn currentTurn) {
   fields free     = inverseOf(red | green);
   fields options  = neighborsOf(free) & player;
   
-  //Serial.println("achiHumanTurn!");
-  //Serial.print("turn: ");
-  //Serial.println((currentTurn == greenTurn) ? "GREEN" : "RED");
-  //Serial.print("red: ");
-  //Serial.println(red, BIN);
-  //Serial.print("green: ");
-  //Serial.println(green, BIN);
-
   //Highlight options
   if (currentTurn == greenTurn) {
-    scanGreen = options;
+    scanGreen  = options;
+    blinkGreen = options;
   } else {
-    scanRed = options;
+    scanRed  = options;
+    blinkRed = options;
   }
  
   //Get valid input
   do {
     input = getKey();
     
-    //Serial.print("Key input: ");
-    //Serial.print(input, BIN);
-    //Serial.print(" free: ");
-    //Serial.println(free, BIN);
-      
   } while (!(input & options));
 
-  //Serial.print("result: ");
-  //Serial.println(input, BIN);
-    
   //Clear highlights
-  scanGreen = 0;
-  scanRed   = 0;
+  scanGreen  = 0;
+  scanRed    = 0;
+  blinkGreen = 0;
+  blinkRed   = 0;
   
   return input;
 
@@ -196,12 +184,6 @@ fields achiComputerTurn(turn currentTurn) {
   fields iterator;   //field iterator
   fields shifted;    //resust of potential shift
   
-  //Serial.println("achiComputerTurn!");
-  //Serial.print("red: ");
-  //Serial.println(red, BIN);
-  //Serial.print("green: ");
-  //Serial.println(green, BIN);
-
   //Try to win
   for (iterator = 0b000000001;
        iterator < 0b111111111;

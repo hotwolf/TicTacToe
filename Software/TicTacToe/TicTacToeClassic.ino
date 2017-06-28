@@ -81,14 +81,6 @@ fields classicHumanTurn(turn currentTurn) {
   fields free   = inverseOf(red | green);
   fields input;
 
-  //Serial.println("classicHumanTurn!");
-  //Serial.print("turn: ");
-  //Serial.println((currentTurn == greenTurn) ? "GREEN" : "RED");
-  //Serial.print("red: ");
-  //Serial.println(red, BIN);
-  //Serial.print("green: ");
-  //Serial.println(green, BIN);
-  
   //Highlight free fields
   if (currentTurn == greenTurn) {
     scanGreen = free;
@@ -100,15 +92,7 @@ fields classicHumanTurn(turn currentTurn) {
   do {
     input = getKey();
 
-  //Serial.print("Key input: ");
-  //Serial.print(input, BIN);
-  //Serial.print(" free: ");
-  //Serial.println(free, BIN);
-
   } while (!(input & free));
-
-  //Serial.print("result: ");
-  //Serial.println(input, BIN);
 
   //Clear highlights
   scanGreen = 0;
@@ -125,50 +109,26 @@ fields classicComputerTurn(turn currentTurn) {
   fields free     = inverseOf(red | green);
   fields options;
 
-  //Serial.println("classicComputerTurn!");
-  //Serial.print("red: ");
-  //Serial.println(red, BIN);
-  //Serial.print("green: ");
-  //Serial.println(green, BIN);
-
-  
   //Complete a row if possible
   if (options = completingDrops(player, opponent)) {
-
-    //Serial.print("win: ");
-    //Serial.println(options, BIN);
-
     return oneOf(options);
   }
 
   //Prevent the opponent from completing a row
   if (options = completingDrops(opponent, player)) {
-
-    //Serial.print("defend: ");
-    //Serial.println(options, BIN);
-
     return oneOf(options);
   }
 
   //Occupy the center if possible
   if (0b000010000 & free) {
-
-    //Serial.println("center");
-
     return 0b000010000;
   }
 
   //Occupy a corner if possible
   if (options = (0b101000101 & free)) {
-
-    //Serial.println("corner");
-
     return oneOf(options);
   }
 
    //Pick a random field
-
-    //Serial.println("random");
-
     return oneOf(free);
 }

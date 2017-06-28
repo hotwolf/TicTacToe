@@ -117,7 +117,6 @@ ISR(TIMER2_COMPB_vect){
   //Debug code
   //digitalWrite(13, HIGH);                 //turn LED on during the execution of the ISR
   //digitalWrite(13, !digitalRead(13));     //turn LED on during the execution of the ISR
-  //Serial.println("Delay!");
 
   if (--keysDelay <= 0) {                    //handle extended delay
     keysDelay = 0;
@@ -146,10 +145,6 @@ ISR(TIMER2_COMPB_vect){
       keys  |= (~PIND & 0xE0) << 1;         //capture row GHI
       PORTD     = 0xE3;                     //select all rows   
       
-      //Debug code
-      //Serial.print("Captured: ");
-      //Serial.println(keys, BIN);
-      
       //Parse captured keys
       key = 0x100;                          //initialize iterator
       while (key) {                         //iterate through keys
@@ -159,10 +154,6 @@ ISR(TIMER2_COMPB_vect){
         key >>= 1;                          //try next key
       }
       
-      //Debug code
-      //Serial.print("Parsed: ");
-      //Serial.println(key, BIN);
-      
       if (key) {                            //input is valid              
         //Queue valid input
         keysBuf[keysBufIn] = key;                    //store key in keyBuf
@@ -171,12 +162,6 @@ ISR(TIMER2_COMPB_vect){
           keysBufOut = (keysBufOut+1)%KEYS_FIFODEPTH;//delete oldest entry if necessary
         }
       }
-      
-      //Debug code
-      //Serial.print("Queue in: ");
-      //Serial.print(keysBufIn);
-      //Serial.print(" out: ");
-      //Serial.println(keysBufOut);
     } 
   }
     
@@ -190,7 +175,6 @@ ISR(PCINT2_vect){
   //Debug code
   //digitalWrite(13, HIGH);                 //turn LED on during the execution of the ISR
   //digitalWrite(13, !digitalRead(13));     //turn LED on during the execution of the ISR
-  //Serial.println("Pin change!");
 
   //Trigger debounce delay
   OCR2B     = TCNT2;                           //~32ms debounce delay

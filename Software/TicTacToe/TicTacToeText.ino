@@ -239,13 +239,8 @@ void textStop() {
 // Animator
 //==========
 void textAnimator(fields *redBuf, fields *greenBuf) {
-  //Serial.print("Animator :");
-  //Serial.println(textFrameCount);
-  
   //Handle special characters
   if (*textRemaining <= 0) {
-    //Serial.print("Special :");
-    //Serial.println(*textRemaining, HEX);
     //Handle escape characters
     while (((*textRemaining & 0xFF) == 0x80) ||
 	   ((*textRemaining & 0xFF) == 0x81) ||
@@ -278,7 +273,6 @@ void textAnimator(fields *redBuf, fields *greenBuf) {
   //Display character
   if (textFrameCount > (FRAMERATE/16)) {
     //Display character
-    //Serial.println("Char!");
     fields pattern = pgm_read_word(&textFontTable[*textRemaining & 0x7F]);
     *redBuf   = textRed   ? pattern : 0;
     *greenBuf = textGreen ? pattern : 0;

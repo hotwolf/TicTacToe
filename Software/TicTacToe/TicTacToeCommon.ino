@@ -44,13 +44,6 @@ boolean isSubset(fields superset, fields subset) {
 // args:   set: set of fields
 // result: inverted set of fields
 fields inverseOf(fields set) {
-
-  //Serial.println("inverseOf!");
-  //Serial.print("set: ");
-  //Serial.println(set, BIN);
-  //Serial.print("return: ");
-  //Serial.println((~set & 0b111111111), BIN);
-
   return (~set & 0b111111111);
 }
 
@@ -70,12 +63,6 @@ fields neighborsOf(fields set) {
   result |= (set << 3) & 0b111111111;
   //Exclude input fields
   result &= ~set;
-
-  //Serial.println("neighborsOf!");
-  //Serial.print("set: ");
-  //Serial.println(set, BIN);
-  //Serial.print("return: ");
-  //Serial.println(result, BIN);
 
   return result;
 }
@@ -105,11 +92,6 @@ unsigned char countOf(fields set) {
       result++;
     }
   }
-  //Serial.println("countOf!");
-  //Serial.print("set: ");
-  //Serial.println(set, BIN);
-  //Serial.print("return: ");
-  //Serial.println(result);
 
   return result;
 }
@@ -122,18 +104,11 @@ fields oneOf(fields set) {
   unsigned char pick;      //random pick
   fields        iterator;  //field iterator
 
-  //Serial.println("oneOf!");
-  //Serial.print("set: ");
-  //Serial.println(set, BIN);
-
   //Count the number of fields
   count = countOf(set);
 
   //no choice
   if (count < 2) {
-
-    //Serial.print("return: ");
-    //Serial.println(set, BIN);
 
     return set;
   }
@@ -141,19 +116,12 @@ fields oneOf(fields set) {
   //Pick a numer that is smaller then the field count  
   pick = random(count);
 
-  //Serial.print("pick: ");
-  //Serial.println(pick);
-
- 
   //Iterate through all fields
   for (iterator = 0b000000001;
        iterator < 0b111111111;
        iterator <<= 1) {
     if (set & iterator) {      
       if (!pick--) {
-
-	//Serial.print("return: ");
-	//Serial.println(iterator, BIN);
 
 	return iterator;
       }
@@ -168,10 +136,6 @@ fields oneOf(fields set) {
 // result: all fields that are part of a completed row
 fields completeRows(fields set) {
   fields result = 0;
-
-  //Serial.println("completeRows!");
-  //Serial.print("set: ");
-  //Serial.println(set, BIN);
   
   //Check 8 patterns
   // ---
@@ -202,33 +166,10 @@ fields completeRows(fields set) {
   // .\.
   // ..\_
   result |= isSubset(set, 0b100010001) ? 0b100010001 : 0b000000000;
-
-  //if (isSubset(set, 0b100010001)) {
-  //  Serial.println("Diagonal row!");
-  //  Serial.print("set: ");
-  //  Serial.println(set, BIN);
-  //  boolean _isSubset = isSubset(set, 0b100010001);
-  //  Serial.print("_isSubset: ");
-  //  Serial.println(_isSubset ? "TRUE" : "FALSE");
-  //  fields _pattern = isSubset ? 0b100010001 : 0b000000000;
-  //  Serial.print("_pattern: ");
-  //  Serial.println(_pattern, BIN);
-  //  Serial.print("result: ");
-  //  Serial.print(result, BIN);
-  //  Serial.print(" => ");
-  //  //result |= _pattern;
-  //  //result |= _isSubset ? 0b100010001 : 0b000000000;
-  //  result |= isSubset(set, 0b100010001) ? 0b100010001 : 0b000000000;
-  //  Serial.println(result, BIN);
-  //}   
-
   // ../
   // ./.
   // /..
   result |= isSubset(set, 0b001010100) ? 0b001010100 : 0b000000000;
-
-  //Serial.print("return: ");
-  //Serial.println(result, BIN);
 
   return result;
 }
@@ -253,74 +194,4 @@ fields completingDrops(fields player, fields opponent) {
   }
   return result;
 }
-
-////Find all shiftable fields
-//// args:   player:   current player's set of fields
-////         opponent: opponent's set of fields
-//// result: all fields that would complete a row for the current player
-//fields validShifts(fields player, fields opponent) {
-//  return (neighborsOf(inverseOf(player|opponent))&player);
-//}
-
-////Find all shiftable fields that will complete a row for the player
-//// args:   player:   current player's set of fields
-////         opponent: opponent's set of fields
-//// result: all fields that would complete a row for the current player
-//fields completingShifts(fields player, fields opponent) {
-//  fields result = 0;    //return value
-//  fields valid;         //all eligible shifts
-//  fields vacant;        //iterator over vacant
-//  fields neighbor;      //iterator over neighbors
-//  
-//  //Iterate vacant fields
-//  for (vacant = 0b000000001;
-//       vacant < 0b111111111;
-//       vacant <<= 1) {
-//    if (!isSubset((player|opponent), vacant)) {  //field must be vacant
-//      if (valid = (neighborsOf(vacant) & player)) {
-//        for (neighbor = 0b000000001;
-//             neighbor < 0b111111111;
-//             neighbor <<= 1) {
-//          if (isSubset(valid, neighbor)) {
-//            if (completedRowsIn(player|vacant&inverseOf(neighbor))) {
-//              result |= neighbor;
-//            }
-//          }
-//        }
-//      }
-//    }
-//  }
-//  return result;
-//}
-              
-////Find all shiftable fields that will allow the opponent to complete a row next turn
-//// args:   player:   current player's set of fields
-////         opponent: opponent's set of fields
-//// result: all fields that would complete a row for the current player
-//fields badShifts(fields player, fields opponent) {
-//  fields result = 0;    //return value
-//  fields valid;         //all eligible shifts
-//  fields vacant;        //iterator over vacant
-//  fields neighbor;      //iterator over neighbors
-//  
-//  //Iterate vacant fields
-//  for (vacant = 0b000000001;
-//       vacant < 0b111111111;
-//       vacant <<= 1) {
-//    if (!isSubset((player|opponent), vacant)) {  //field must be vacant
-//      if (valid = (neighborsOf(vacant) & player)) {
-//        for (neighbor = 0b000000001;
-//             neighbor < 0b111111111;
-//             neighbor <<= 1) {
-//          if (isSubset(valid, neighbor)) {
-//            if (completingShifts(opponent ,(player|vacant&inverseOf(neighbor)))) {
-//              result |= neighbor;
-//            }
-//          }
-//        }
-//      }
-//    }
-//  }
-//  return result;
-//}
 
