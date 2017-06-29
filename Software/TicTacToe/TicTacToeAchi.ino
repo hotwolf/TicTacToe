@@ -44,19 +44,13 @@ void achiPlay() {
 
   Serial.println("Achi!");
 
-
-  //8 turns of drop game
-  for (int i = 0; i < 4; i++) {
+  //4 rounds of drop game
+  while (countOf(red) < 4)
 
     //Green move
     //==========
     green |= classicTurn(greenTurn);           //place green piece
     if (blinkGreen = completedRowsIn(green)) { //check if green has won
-      gameOver = true;
-      break;
-    } else if ((red|green) == 0b111111111) {   //check for tie
-      blinkRed   = 0b111111111;                //flash all LEDs
-      blinkGreen = 0b111111111;
       gameOver = true;
       break;
     }
@@ -67,13 +61,9 @@ void achiPlay() {
     if (blinkRed = completedRowsIn(red)) {     //check if green has won
       gameOver = true;
       break;
-    } else if ((red|green) == 0b111111111) {   //check for tie
-      blinkRed   = 0b111111111;                //flash all LEDs
-      blinkGreen = 0b111111111;
-      gameOver = true;
-      break;
     }
   }
+
   //Start move game in case of a tie
   if (!gameOver) {
 

@@ -57,10 +57,6 @@ void miserePlay() {
     red |= misereTurn(redTurn);              //place red piece
     if (blinkGreen = completedRowsIn(red)) { //check if green has won
       break;
-    } else if ((red|green) == 0b111111111) { //check for tie
-      blinkRed   = 0b111111111;              //flash all LEDs
-      blinkGreen = 0b111111111;
-      break;
     }
   }
 
