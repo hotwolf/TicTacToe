@@ -36,7 +36,7 @@
 // result: inverted set of fields
 fields inverseOf(fields set) {
 
-  return (~set & 0b111111111);
+  return (set ^ 0b111111111);
 
 }
 

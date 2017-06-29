@@ -45,7 +45,7 @@ void achiPlay() {
   Serial.println("Achi!");
 
   //4 rounds of drop game
-  while (countOf(red) < 4)
+  while (countOf(red) < 4) {
 
     //Green move
     //==========

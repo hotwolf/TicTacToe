@@ -52,8 +52,8 @@ fields gameSelection;
 //===============
 void setup() {
   //Serial library
-  Serial.begin(9600);
-  Serial.println("Ready for debugging!");
+  //Serial.begin(9600);
+  //Serial.println("Ready for debugging!");
 
   //Random seed
   randomSeed(analogRead(0));

@@ -44,7 +44,7 @@ boolean isSubset(fields superset, fields subset) {
 // args:   set: set of fields
 // result: inverted set of fields
 fields inverseOf(fields set) {
-  return (~set & 0b111111111);
+  return (set ^ 0b111111111);
 }
 
 //Find all horizintal and vertical neighbors of a given set of fields

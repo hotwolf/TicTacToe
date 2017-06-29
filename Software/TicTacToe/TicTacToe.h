@@ -61,7 +61,6 @@ void (*dispAnimator)(fields *red, fields *green) = NULL;//function pointer
 bool greenIsHuman  = true;
 bool redIsHuman    = false;
 
-
 // Inline assembler
 //==================
 //Wait for any interrupt
