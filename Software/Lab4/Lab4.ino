@@ -75,7 +75,7 @@ void setup() {
   //            V       V       V        V 
   //textShow("\x82TIC \x81TAC \x82TOE \x80");
 
-  //textShow("  ...put your own text here...);  
+  textShow("...put your own text here...\x80);  
 
   gameSelection = getKey();
   textStop();
