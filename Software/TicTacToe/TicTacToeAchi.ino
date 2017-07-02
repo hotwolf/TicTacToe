@@ -151,7 +151,7 @@ fields achiHumanTurn(turn currentTurn) {
 
   //Get valid input
   do {
-    gameSelection = getKey();
+    input = getKey();
 
   } while (!(input & options));
 
