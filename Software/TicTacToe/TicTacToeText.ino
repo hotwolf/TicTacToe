@@ -136,7 +136,7 @@ const fields textFontTable[]PROGMEM = {0b000010000, // 0b00 NUL ... ... ... ...
                                        0b011100111, // 0x4A J   #.# .#. ##. #.#
                                        0b101011101, // 0x4B K                  
 		                                   
-                                       0b001001111, // 0x4C L   #.. ### ##. ###
+                                       0b111001001, // 0x4C L   #.. ### ##. ###
                                        0b101111111, // 0x4D M   #.. ### ### #.#
                                        0b101111011, // 0x4E N   ### #.# #.# ###
                                        0b111101111, // 0x4F O                  
@@ -176,7 +176,7 @@ const fields textFontTable[]PROGMEM = {0b000010000, // 0b00 NUL ... ... ... ...
                                        0b011100111, // 0x6A j   #.# .#. ##. #.#
                                        0b101011101, // 0x6B k                  
 		                                   
-                                       0b001001111, // 0x6C l   #.. ### ##. ###
+                                       0b111001001, // 0x6C l   #.. ### ##. ###
                                        0b101111111, // 0x6D m   #.. ### ### #.#
                                        0b101111011, // 0x6E n   ### #.# #.# ###
                                        0b111101111, // 0x6F o                  
@@ -250,10 +250,10 @@ void textAnimator(fields *redBuf, fields *greenBuf) {
       if ((*textRemaining & 0xFF) == 0x80) {
 	//Loop
 	textRemaining = textStart;
-      }
-      if ((*textRemaining & 0xFF) == 0x84) {
+      } else if ((*textRemaining & 0xFF) == 0x84) {
 	//Set loop marker
-	textStart = ++textRemaining;
+	textRemaining++;                     //advance to next character    
+	textStart = textRemaining;
       } else {
 	//Set color
 	textRed   = (*textRemaining & 0x01) ? true : false;

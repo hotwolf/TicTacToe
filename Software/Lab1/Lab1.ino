@@ -47,10 +47,10 @@ void loop() {
   debugInput();
 
   //Test function
-  output = completeRows(green);
-  //output = completingDrops(red, green);
+  output = completedRowsIn(green);
+  //output = completingDrops(green, red);
 
-  //Print result (blinkRed)
+  //Print result
   debugOutput(output);
 }
 

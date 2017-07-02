@@ -33,33 +33,35 @@
 //=======================
 //Computer turn in the classic game
 // args:   color
-//fields classicComputerTurn(turn currentTurn) {
-//  fields player   = (currentTurn == greenTurn) ? green : red;
-//  fields opponent = (currentTurn == greenTurn) ? red   : green;
-//  fields free     = inverseOf(red | green);
-//  fields options;
-//
-//  //Try to win the game. Complete a row if possible
-//  if (options = completingDrops(player, opponent)) {
-//    return oneOf(options);
-//  }
-//
-//  //Prevent the opponent from winning. Block a row of the opponent if possible
-//  if (options = completingDrops(opponent, player)) {
-//    return oneOf(options);
-//  }
-//
-//  //Occupy the center if possible
-//  if (0b000010000 & free) {
-//    return 0b000010000;
-//  }
-//
-//  //Occupy a corner if possible
-//  if (options = (0b101000101 & free)) {
-//    return oneOf(options);
-//  }
-//
-//  //Pick a random field
-//  return oneOf(free);
-//
-//}
+/*
+fields classicComputerTurn(turn currentTurn) {
+  fields player   = (currentTurn == greenTurn) ? green : red;
+  fields opponent = (currentTurn == greenTurn) ? red   : green;
+  fields free     = inverseOf(red | green);
+  fields options;
+
+  //Try to win the game. Complete a row if possible
+  if (options = completingDrops(player, opponent)) {
+    return oneOf(options);
+  }
+
+  //Prevent the opponent from winning. Block a row of the opponent if possible
+  if (options = completingDrops(opponent, player)) {
+    return oneOf(options);
+  }
+
+  //Occupy the center if possible
+  if (0b000010000 & free) {
+    return 0b000010000;
+  }
+
+  //Occupy a corner if possible
+  if (options = (0b101000101 & free)) {
+    return oneOf(options);
+  }
+
+  //Pick a random field
+  return oneOf(free);
+
+}
+*/

@@ -75,23 +75,23 @@ void debugOutput(fields output) {
   }
   Serial.println(":");
   //Print top row
-  debugPrintInputRow(0b000000001)
-  Serial.println("      ");
-  debugPrintOutputRow(0b000000001, output)
+  debugPrintInputRow(0b000000001);
+  Serial.print("      ");
+  debugPrintOutputRow(0b000000001, output);
   Serial.println();
   //Print row seperator
   Serial.println("-+-+-      -+-+-");
   //Print middle row
-  debugPrintInputRow(0b000001000)
-  Serial.println("  =>  ");
-  debugPrintOutputRow(0b000001000, output)
+  debugPrintInputRow(0b000001000);
+  Serial.print("  =>  ");
+  debugPrintOutputRow(0b000001000, output);
   Serial.println();
   //Print row seperator
   Serial.println("-+-+-      -+-+-");
   //Print bottom row
-  debugPrintInputRow(0b001000000)
-  Serial.println("  =>  ");
-  debugPrintOutputRow(0b001000000, output)
+  debugPrintInputRow(0b001000000);
+  Serial.print("      ");
+  debugPrintOutputRow(0b001000000, output);
   Serial.println();
   Serial.println();
 }
@@ -100,7 +100,7 @@ void debugOutput(fields output) {
 // args:   position (leftmost field in the row) 
 // result: none
 void debugPrintInputRow(fields position) {
-  for (int i = 0, i < 3, i++) {
+  for (int i = 0; i < 3; i++) {
     //Print column separator
     if (i) {
       Serial.print("|");
@@ -124,8 +124,8 @@ void debugPrintInputRow(fields position) {
 // args:   position (leftmost field in the row) 
 //         output
 // result: none
-void debugPrintInputRow(fields position, fields output) {
-  for (int i = 0, i < 3, i++) {
+void debugPrintOutputRow(fields position, fields output) {
+  for (int i = 0; i < 3; i++) {
     //Print column separator
     if (i) {
       Serial.print("|");

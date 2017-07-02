@@ -34,6 +34,7 @@
 //Play the classic game
 // args:   none 
 // result: none
+/*
 void classicPlay () {
   //Game loop
   while (1) {
@@ -61,3 +62,4 @@ void classicPlay () {
     }
   }
 }
+*/

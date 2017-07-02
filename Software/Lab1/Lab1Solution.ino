@@ -29,74 +29,52 @@
 
 #include "TicTacToe.h"
 
-// inverseOf()
-//=============
-//Invert a set of fields
-// args:   set: set of fields
-// result: inverted set of fields
-fields inverseOf(fields set) {
-
-  return (~set & 0b111111111);
-
-}
-
-// isSubset()
-//============
-//Check if a set of fields is a subset of another set of fields
-// args:   superset: set of fields
-//         subset:   set of fields  
-// result: true if "subset" is a subset of "superset"
-boolean isSubset(fields superset, fields subset) {
-
-  return ((superset & subset) == subset);
-
-}
-
 // completedRowsIn()
 //===================
 //Find all completed rows in a given set of fields
 // args:   set: set of fields
 // result: all fields that are part of a completed row
-// 
-//fields completedRowsIn(fields set) {
-//  fields result = 0;
-//
-//  //Check 8 patterns
-//  // ---
-//  // ...
-//  // ...
-//  result |= isSubset(set, 0b000000111) ? 0b000000111 : 0b000000000;
-//  // ...
-//  // ---
-//  // ...
-//  result |= isSubset(set, 0b000111000) ? 0b000111000 : 0b000000000;
-//  // ...
-//  // ...
-//  // ---
-//  result |= isSubset(set, 0b111000000) ? 0b111000000 : 0b000000000;
-//  // |..
-//  // |..
-//  // |..
-//  result |= isSubset(set, 0b001001001) ? 0b001001001 : 0b000000000;
-//  // .|.
-//  // .|.
-//  // .|.
-//  result |= isSubset(set, 0b010010010) ? 0b010010010 : 0b000000000;
-//  // ..|
-//  // ..|
-//  // ..|
-//  result |= isSubset(set, 0b100100100) ? 0b100100100 : 0b000000000;
-//  // \..
-//  // .\.
-//  // ..\_
-//  result |= isSubset(set, 0b100010001) ? 0b100010001 : 0b000000000;
-//  // ../
-//  // ./.
-//  // /..
-//  result |= isSubset(set, 0b001010100) ? 0b001010100 : 0b000000000;
-//
-//  return result;
-//}
+/* 
+fields completedRowsIn(fields set) {
+  fields result = 0;
+
+  //Check 8 patterns
+  // ---
+  // ...
+  // ...
+  result |= isSubset(set, 0b000000111) ? 0b000000111 : 0b000000000;
+  // ...
+  // ---
+  // ...
+  result |= isSubset(set, 0b000111000) ? 0b000111000 : 0b000000000;
+  // ...
+  // ...
+  // ---
+  result |= isSubset(set, 0b111000000) ? 0b111000000 : 0b000000000;
+  // |..
+  // |..
+  // |..
+  result |= isSubset(set, 0b001001001) ? 0b001001001 : 0b000000000;
+  // .|.
+  // .|.
+  // .|.
+  result |= isSubset(set, 0b010010010) ? 0b010010010 : 0b000000000;
+  // ..|
+  // ..|
+  // ..|
+  result |= isSubset(set, 0b100100100) ? 0b100100100 : 0b000000000;
+  // \..
+  // .\.
+  // ..\_
+  result |= isSubset(set, 0b100010001) ? 0b100010001 : 0b000000000;
+  // ../
+  // ./.
+  // /..
+  result |= isSubset(set, 0b001010100) ? 0b001010100 : 0b000000000;
+
+  return result;
+}
+*/
 
 // completingDrops()
 //===================
@@ -104,19 +82,22 @@ boolean isSubset(fields superset, fields subset) {
 // args:   player:   current player's set of fields
 //         opponent: opponent's set of fields
 // result: all fields that would complete a row for the current player
-//fields completingDrops(fields player, fields opponent) {
-//  fields result = 0;   //return value
-//  fields iterator;     //field iterator
-//
-//  //Iterate through all fields
-//  for (iterator = 0b000000001;
-//       iterator < 0b111111111;
-//       iterator <<= 1) {
-//    if (!isSubset((player|opponent), iterator)) {
-//      if (completedRowsIn(player|iterator)) {
-//        result |= iterator;
-//      }
-//    }
-//  }
-//  return result;
-//}
+/*
+fields completingDrops(fields player, fields opponent) {
+
+  fields result = 0;   //return value
+  fields iterator;     //field iterator
+
+  //Iterate through all fields
+  for (iterator = 0b000000001;
+       iterator < 0b111111111;
+       iterator <<= 1) {
+    if (!isSubset((player|opponent), iterator)) {
+      if (completedRowsIn(player|iterator)) {
+        result |= iterator;
+      }
+    }
+  }
+  return result;
+}
+*/

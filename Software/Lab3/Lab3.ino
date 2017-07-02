@@ -42,14 +42,22 @@ void setup() {
 //============
 void loop() {
 
-    //Human against computer, human begins
-    greenIsHuman = true;
-    redIsHuman   = false;
+  //Human against computer, human begins
+  greenIsHuman = true;
+  redIsHuman   = false;
+ 
+  //Clear display
+  red        = 0;
+  green      = 0;
+  scanRed    = 0;
+  scanGreen  = 0;
+  blinkRed   = 0;
+  blinkGreen = 0;
 
-    //Classic
-    classicPlay();
+  //Classic
+  classicPlay();
 
-    //Wait for key
-    getKey();
+  //Wait for key
+  getKey();
 
 }
