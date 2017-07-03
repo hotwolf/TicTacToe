@@ -23,71 +23,70 @@
 //#                                                                             #
 //###############################################################################
 //# Version History:                                                            #
-//#    June 28, 2017                                                            #
+//#    July 3, 2017                                                             #
 //#      - Initial release                                                      #
 //###############################################################################
 
 #include "TicTacToe.h"
 
-// inverseOf()
-//=============
-//Invert a set of fields
-// args:   set: set of fields
-// result: inverted set of fields
-fields inverseOf(fields set) {
-
-  return (set ^ 0b111111111);
-
-}
-
-// isSubset()
-//============
-//Check if a set of fields is a subset of another set of fields
-// args:   superset: set of fields
-//         subset:   set of fields
-// result: true if "subset" is a subset of "superset"
-boolean isSubset(fields superset, fields subset) {
-
-  return ((superset & subset) == subset);
-
-}
-
 // completedRowsIn()
 //===================
 //Find all completed rows in a given set of fields
 // args:   set: set of fields
-// result: all fields that are part of a completed row
-//
-//Examples:
-//
-//  |*|          | |
-// -+-+-        -+-+-
-// *| |*   =>    | |
-// -+-+-        -+-+-
-// *| |          | |
-//
-//  |*|          | |
-// -+-+-        -+-+-
-// *|*|*   =>   *|*|*
-// -+-+-        -+-+-
-// *| |          | |
-//
-//  |*|*         | |*
-// -+-+-        -+-+-
-// *|*|*   =>   *|*|*
-// -+-+-        -+-+-
-// *| |         *| |
-//
+// result: all fields that are part of a completed row 
 fields completedRowsIn(fields set) {
+  fields result = 0;
 
+  //Check 8 patterns
+  // ---
+  // ...
+  // ...
+  if (isSubsetOf(0b000000111, set)) {
+    result = result | 0b000000111;
+  }
+  // ...
+  // ---
+  // ...
 
+     //...your code...
 
+  // ...
+  // ...
+  // ---
 
-  //...your code...
+     //...your code...
 
+  // |..
+  // |..
+  // |..
 
+     //...your code...
 
+  // .|.
+  // .|.
+  // .|.
 
+     //...your code...
+
+  // ..|
+  // ..|
+  // ..|
+
+     //...your code...
+
+  // \..
+  // .\.
+  // ..\_
+
+     //...your code...
+
+  // ../
+  // ./.
+  // /..
+
+     //...your code...
+
+  return result;
 }
 
 // completingDrops()
@@ -96,42 +95,37 @@ fields completedRowsIn(fields set) {
 // args:   player:   current player's set of fields
 //         opponent: opponent's set of fields
 // result: all fields that would complete a row for the current player
-//
-//Examples:
-//
-//  |O|         *| |
-// -+-+-        -+-+-
-// P| |O   =>    | |
-// -+-+-        -+-+-
-// P| |          | |
-//
-//  |O|         *| |*
-// -+-+-        -+-+-
-// P|P|O   =>    | |
-// -+-+-        -+-+-
-// P| |          | |
-//
-// O| |O         | |
-// -+-+-        -+-+-
-// P|P|O   =>    | |
-// -+-+-        -+-+-
-// P| |          | |
-//
 fields completingDrops(fields player, fields opponent) {
 
+  fields result = 0;   //return value
+  fields iterator;     //field iterator
 
+  //Iterate through all fields
+  for (iterator = 0b000000001;
+       iterator < 0b111111111;
+       iterator <<= 1) {
 
+       //...your code...
 
-  //...your code...
-
-
-
-  
+  }
+  return result;
 }
 
-  //Tip:
-  //To loop through all fields try this:
-  //
-  //for (fields iterator = 0b000000001; iterator < 0b111111111; iterator <<= 1) {
-  //  ...
-  //}
+// isSubsetOf()
+//============
+//Check if a set of fields is a subset of another set of fields
+// args:   superset: set of fields
+//         subset:   set of fields
+// result: true if "subset" is a subset of "superset"
+boolean isSubsetOf(fields subset, fields superset) {
+  return ((superset & subset) == subset);
+}
+
+// inverseOf()
+//=============
+//Invert a set of fields
+// args:   set: set of fields
+// result: inverted set of fields
+fields inverseOf(fields set) {
+  return (set ^ 0b111111111);
+}

@@ -40,40 +40,27 @@ fields classicComputerTurn(turn currentTurn) {
   fields options;
 
   //Try to win the game. Complete a row if possible
-
-
-     //...your code...
-
+  if (options = completingDrops(player, opponent)) {
+    return oneOf(options);
+  }
 
   //Prevent the opponent from winning. Block a row of the opponent if possible
 
-
      //...your code...
-
 
   //Occupy the center if possible
 
-
      //...your code...
-
 
   //Occupy a corner if possible
 
-
      //...your code...
 
-
   //Pick a random field
-
 
      //...your code...
 
 }
-
-  //Tip:
-  //To pick one field from a set, use the function oneOf(...);
-  //
-
 
 // oneOf()
 //=========

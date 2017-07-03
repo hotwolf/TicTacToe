@@ -26,7 +26,7 @@
 //#    June 28, 2017                                                            #
 //#      - Initial release                                                      #
 //###############################################################################
-
+/*
 #include "TicTacToe.h"
 
 // classicPlay()
@@ -34,14 +34,13 @@
 //Play the classic game
 // args:   none 
 // result: none
-/*
 void classicPlay () {
   //Game loop
   while (1) {
 
     //Green move
     //==========
-    green |= classicTurn(greenTurn);          //place green piece
+    green = green | classicTurn(greenTurn);   //place green piece
 
     //Check if green won, otherwise check for a tie
     if (blinkGreen = completedRowsIn(green)) {//check if green has won
@@ -54,12 +53,53 @@ void classicPlay () {
   
     //Red move
     //========
-    red |= classicTurn(redTurn);              //place red piece
+    red = red | classicTurn(redTurn);         //place red piece
 
     //Check if red won, otherwise check for a tie
     if (blinkRed = completedRowsIn(red)) {    //check if green has won
       break;
     }
   }
+}
+
+// classicTurn()
+//===============
+//One turn of the classic game
+// args:   color
+// result: new mark to be placed
+fields classicTurn(turn currentTurn) { 
+  if ((currentTurn == greenTurn) ? greenIsHuman : redIsHuman) {
+    return classicHumanTurn(currentTurn);
+  } else {
+    return classicComputerTurn(currentTurn);
+  }
+}
+
+// classicHumanTurn()
+//====================
+//Human turn in the classic game
+// args:   color
+fields classicHumanTurn(turn currentTurn) {
+  fields free   = inverseOf(red | green);
+  fields input;
+
+  //Highlight free fields
+  if (currentTurn == greenTurn) {
+    scanGreen = free;
+  } else {
+    scanRed   = free;
+  } 
+
+  //Get valid input
+  do {
+    input = getKey();
+
+  } while (!(input & free));
+
+  //Clear highlights
+  scanGreen = 0;
+  scanRed   = 0;
+
+  return input;
 }
 */

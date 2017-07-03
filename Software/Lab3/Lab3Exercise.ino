@@ -40,36 +40,22 @@ void classicPlay () {
 
     //Green move
     //==========
-    green |= classicTurn(greenTurn);          //place green piece
+    green = green | classicTurn(greenTurn);   //place green piece
 
     //Check if green won, otherwise check for a tie
-
-    
-    //...your code...
-
-  
+ 
+       //...your code... (Tip: use "break;" to exit the while-loop)
+   
     //Red move
     //========
-    red |= classicTurn(redTurn);              //place red piece
+    red = red | classicTurn(redTurn);         //place red piece
 
     //Check if red won, otherwise check for a tie
 
-    
-    //...your code...
+       //...your code... (Tip: use "break;" to exit the while-loop)
 
   }
 }
-
-  //Tips:
-  //Use "break;" to exit the while(1) loop
-  //
-  //To make a pattern blink on the display, do:
-  //
-  // blinkGreen = 0b.........;
-  //   ...or...
-  // blinkRed   = 0b.........;
-  //
-
 
 // classicTurn()
 //===============

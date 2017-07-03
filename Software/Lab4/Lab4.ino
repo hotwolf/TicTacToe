@@ -123,4 +123,3 @@ void loop() {
   //Next game
   gameSelection = getKey();
 }
-

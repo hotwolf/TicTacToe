@@ -26,14 +26,13 @@
 //#    June 28, 2017                                                            #
 //#      - Initial release                                                      #
 //###############################################################################
-
+/*
 #include "TicTacToe.h"
 
 // classicComputerTurn()
 //=======================
 //Computer turn in the classic game
 // args:   color
-/*
 fields classicComputerTurn(turn currentTurn) {
   fields player   = (currentTurn == greenTurn) ? green : red;
   fields opponent = (currentTurn == greenTurn) ? red   : green;
@@ -62,6 +61,59 @@ fields classicComputerTurn(turn currentTurn) {
 
   //Pick a random field
   return oneOf(free);
+}
 
+// oneOf()
+//=========
+//Select one random field out of a given set
+// args:   set: set of selectable fields
+// result: randomly selected field
+fields oneOf(fields set) {
+  unsigned char count;     //number of fields
+  unsigned char pick;      //random pick
+  fields        iterator;  //field iterator
+
+  //Count the number of fields
+  count = countOf(set);
+
+  //No choice
+  if (count < 2) {
+    return set;
+  }
+
+  //Pick a numer that is smaller then the field count
+  pick = random(count);
+
+  //Iterate through all fields
+  for (iterator = 0b000000001;
+       iterator < 0b111111111;
+       iterator <<= 1) {
+    if (set & iterator) {
+      if (!pick--) {
+        return iterator;
+      }
+    }
+  }
+}
+
+// countOf()
+//===========
+//Count the fields in a given set
+// args:   set: set of fields
+// result: number of fields in the the set
+unsigned char countOf(fields set) {
+  unsigned char result = 0; //return value
+  fields        iterator;   //field iterator
+
+  //Iterate through all fields
+  for (iterator = 0b000000001;
+       iterator < 0b111111111;
+       iterator <<= 1) {
+    if (set & iterator) {
+      result++;
+    }
+  }
+
+  return result;
 }
 */
