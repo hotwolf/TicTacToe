@@ -105,11 +105,13 @@ fields completingDrops(fields player, fields opponent) {
   for (iterator = 0b000000001;
        iterator < 0b111111111;
        iterator <<= 1) {
-    if (!isSubset((player|opponent), iterator)) {
+
+    if (isSubsetOf(iterator, inverseOf(player|opponent))) {
       if (completedRowsIn(player|iterator)) {
-        result |= iterator;
+        result = result | iterator;
       }
     }
+
   }
   return result;
 }
