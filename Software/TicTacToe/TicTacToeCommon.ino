@@ -34,7 +34,7 @@
 // args:   superset: set of fields
 //         subset:   set of fields
 // result: true if "subset" is a subset of "superset"
-boolean isSubset(fields superset, fields subset) {
+boolean isSubsetOf(fields subset, fields superset) {
   return ((superset & subset) == subset);
 }
 
@@ -139,35 +139,35 @@ fields completedRowsIn(fields set) {
   // ---
   // ...
   // ...
-  result |= isSubset(set, 0b000000111) ? 0b000000111 : 0b000000000;
+  result |= isSubsetOf(0b000000111, set) ? 0b000000111 : 0b000000000;
   // ...
   // ---
   // ...
-  result |= isSubset(set, 0b000111000) ? 0b000111000 : 0b000000000;
+  result |= isSubsetOf(0b000111000, set) ? 0b000111000 : 0b000000000;
   // ...
   // ...
   // ---
-  result |= isSubset(set, 0b111000000) ? 0b111000000 : 0b000000000;
+  result |= isSubsetOf(0b111000000, set) ? 0b111000000 : 0b000000000;
   // |..
   // |..
   // |..
-  result |= isSubset(set, 0b001001001) ? 0b001001001 : 0b000000000;
+  result |= isSubsetOf(0b001001001, set) ? 0b001001001 : 0b000000000;
   // .|.
   // .|.
   // .|.
-  result |= isSubset(set, 0b010010010) ? 0b010010010 : 0b000000000;
+  result |= isSubsetOf(0b010010010, set) ? 0b010010010 : 0b000000000;
   // ..|
   // ..|
   // ..|
-  result |= isSubset(set, 0b100100100) ? 0b100100100 : 0b000000000;
+  result |= isSubsetOf(0b100100100, set) ? 0b100100100 : 0b000000000;
   // \..
   // .\.
   // ..\_
-  result |= isSubset(set, 0b100010001) ? 0b100010001 : 0b000000000;
+  result |= isSubsetOf(0b100010001, set) ? 0b100010001 : 0b000000000;
   // ../
   // ./.
   // /..
-  result |= isSubset(set, 0b001010100) ? 0b001010100 : 0b000000000;
+  result |= isSubsetOf(0b001010100, set) ? 0b001010100 : 0b000000000;
 
   return result;
 }
@@ -184,7 +184,7 @@ fields completingDrops(fields player, fields opponent) {
   for (iterator = 0b000000001;
        iterator < 0b111111111;
        iterator <<= 1) {
-    if (!isSubset((player|opponent), iterator)) {
+    if (isSubsetOf(iterator, inverseOf(player|opponent))) {
       if (completedRowsIn(player|iterator)) {
         result |= iterator;
       }
