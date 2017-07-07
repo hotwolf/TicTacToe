@@ -55,7 +55,7 @@ void classicPlay () {
     //========
     red = red | classicTurn(redTurn);         //place red piece
 
-    //Check if red won, otherwise check for a tie
+    //Check if red won
     if (blinkRed = completedRowsIn(red)) {    //check if green has won
       break;
     }

@@ -50,7 +50,7 @@ void classicPlay () {
     //========
     red = red | classicTurn(redTurn);         //place red piece
 
-    //Check if red won, otherwise check for a tie
+    //Check if red won
 
        //...your code... (Tip: use "break;" to exit the while-loop)
 

@@ -49,6 +49,6 @@ void loop() {
   //Test function
   output = classicComputerTurn(greenTurn);
   
-  //Print result (blinkRed)
+  //Print result
   debugOutput(output);
 }
