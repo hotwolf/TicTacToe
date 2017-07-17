@@ -17,10 +17,6 @@
 //#    You should have received a copy of the GNU General Public License        #
 //#    along with TicTacToe.  If not, see <http://www.gnu.org/licenses/>.       #
 //###############################################################################
-//#                                                                             #
-//#                                                                             #
-//#                                                                             #
-//###############################################################################
 //# Version History:                                                            #
 //#    April 5, 2017                                                            #
 //#      - Initial release                                                      #
@@ -50,19 +46,30 @@ fields inverseOf(fields set) {
 //Find all horizintal and vertical neighbors of a given set of fields
 // args:   set: set of fields to find neighbors for
 // result: neighbors of input set
+// A|B|C     15     8 7      0
+// -+-+-    +--------+--------+ 
+// D|E|F => |-------I|HGFEDCBA| 
+// -+-+-    +--------+--------+ 
+// G|H|I
 fields neighborsOf(fields set) {
   fields result = 0;
 
-  //Left neighbors
-  result |= (set & 0b011011011) << 1;
   //Right neighbors
+  result |= (set & 0b011011011) << 1;
+  //Left neighbors
   result |= (set & 0b110110110) >> 1;
   //Upper neighbors
-  result |= (set >> 3);
+  result |= (set & 0b111111000) >> 3;
   //Lower neighbors
-  result |= (set << 3) & 0b111111111;
-  //Exclude input fields
-  result &= ~set;
+  result |= (set & 0b000111111) << 3;
+  //Upper right neighbors
+  result |= (set & 0b011011000) >> 2;
+  //Lower left neighbors
+  result |= (set & 0b000110110) << 2;
+  //Upper left neighbors
+  result |= (set & 0b110110000) >> 4;
+  //Lower right neighbors
+  result |= (set & 0b000011011) << 4;
 
   return result;
 }
