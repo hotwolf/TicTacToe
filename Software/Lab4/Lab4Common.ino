@@ -46,13 +46,13 @@ fields neighborsOf(fields set) {
   //Lower neighbors
   result |= (set & 0b000111111) << 3;
   //Upper right neighbors
-  result |= (set & 0b011011000) >> 2;
+  result |= (set & 0b001010000) >> 2;
   //Lower left neighbors
-  result |= (set & 0b000110110) << 2;
+  result |= (set & 0b000010100) << 2;
   //Upper left neighbors
-  result |= (set & 0b110110000) >> 4;
+  result |= (set & 0b100010000) >> 4;
   //Lower right neighbors
-  result |= (set & 0b000011011) << 4;
+  result |= (set & 0b000010001) << 4;
 
   //Exclude input fields
   result &= ~set;
