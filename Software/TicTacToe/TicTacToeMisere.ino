@@ -80,12 +80,8 @@ fields misereComputerTurn(turn currentTurn) {
   fields opponent = (currentTurn == greenTurn) ? red   : green;
   fields options  = inverseOf(red | green);
   fields strategicMoves;
-
-  Serial.println("misereComputerTurn!");
-  Serial.print("red: ");
-  Serial.println(red, BIN);
-  Serial.print("green: ");
-  Serial.println(green, BIN);
+ 
+  delay(COMPUTERDELAY);
 
   //Avoid completing a row
   strategicMoves = completingDrops(player, opponent);
@@ -110,7 +106,6 @@ fields misereComputerTurn(turn currentTurn) {
   }
 
   //Pick one of the remaining options
-  Serial.println("random");
   return oneOf(options);
 }
 

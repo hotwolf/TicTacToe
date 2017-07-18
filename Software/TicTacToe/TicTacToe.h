@@ -35,6 +35,8 @@
 //===========
 #define FRAMERATE  120              //refresh rate [fps]
 
+#define COMPUTERDELAY  500          //computer thinking break
+
 // Type definitions
 //==================
 // A|B|C     15     8 7      0

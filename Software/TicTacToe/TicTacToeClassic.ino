@@ -105,6 +105,8 @@ fields classicComputerTurn(turn currentTurn) {
   fields free     = inverseOf(red | green);
   fields options;
 
+  delay(COMPUTERDELAY);
+
   //Complete a row if possible
   if (options = completingDrops(player, opponent)) {
     return oneOf(options);

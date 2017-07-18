@@ -175,7 +175,9 @@ fields achiComputerTurn(turn currentTurn) {
   fields iterator;   //field iterator
   fields moved;    //resust of potential move
 
-  //Try to win
+  delay(COMPUTERDELAY);
+
+ //Try to win
   for (iterator = 0b000000001;
        iterator < 0b111111111;
        iterator <<= 1) {
